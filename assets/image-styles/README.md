@@ -449,9 +449,9 @@ accounts:
 
 ---
 
-### infographic-warm ⭐(贴图默认)
+### infographic-warm
 
-暖色手绘水彩 + 高密度中文信息图。适合做贴图默认视觉,但不固定角色、区块和装饰元素。
+⭐ **贴图模式默认**。暖色手绘水彩 + 高密度中文信息图。适合做贴图默认视觉,但不固定角色、区块和装饰元素。
 
 <table>
 <tr><td width="300">
@@ -469,9 +469,9 @@ accounts:
 
 ---
 
-### infographic-blue 🔥
+### infographic-blue
 
-和 warm 同一手绘水彩语言,但换冷蓝基底 + 橙色强调,工程师气质。
+🔥 和 warm 同一手绘水彩语言,但换冷蓝基底 + 橙色强调,工程师气质。
 
 <table>
 <tr><td width="300">
@@ -488,9 +488,9 @@ accounts:
 
 ---
 
-### infographic-dark 🔥
+### infographic-dark
 
-同视觉语言的深色变体。深靛蓝夜空底 + 霓虹青黄手绘,像夜间实验室档案。
+🔥 同视觉语言的深色变体。深靛蓝夜空底 + 霓虹青黄手绘,像夜间实验室档案。
 
 <table>
 <tr><td width="300">
@@ -507,9 +507,9 @@ accounts:
 
 ---
 
-### infographic-mint 🔥
+### infographic-mint
 
-同视觉语言的清新变体。米白底 + 薄荷绿 + 珊瑚橙,友好感强。
+🔥 同视觉语言的清新变体。米白底 + 薄荷绿 + 珊瑚橙,友好感强。
 
 <table>
 <tr><td width="300">
