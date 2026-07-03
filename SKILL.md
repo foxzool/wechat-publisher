@@ -363,7 +363,7 @@ Claude 明确说:"现在进入人味化改写 pass"。对骨架稿**逐段**过�
 
 #### 风格选择
 
-1. 不指定 → 用账号的 `image_style`(`main` = `hand-drawn-blue`,`tech` = `tech-card-blue`)→ 兜底 `hand-drawn-blue`
+1. 不指定 → 用账号的 `image_style`(`main` = `hand-drawn-blue`,`tech` = `marker-lime`)→ 兜底 `hand-drawn-blue`
 2. 单篇覆盖:article frontmatter 加 `image_style: <name>`,或 CLI `--image-style <name>`
 3. 可用风格列表:
    ```bash
@@ -373,10 +373,9 @@ Claude 明确说:"现在进入人味化改写 pass"。对骨架稿**逐段**过�
 | 风格 | 最适合 | 卡面密度 |
 |---|---|---|
 | `hand-drawn-blue` | AI / 产品 / 工程类通用(默认) | 中 |
-| `tech-card-blue` | 技术技巧 / 命令讲解 / 短观点 | **低**(大字少内容) |
+| `marker-lime`(+pink/sky/coral/violet)| 刷体大字标题卡 / 爆点 / 热评 / 金句 / 短观点(**卡片默认**)| **低** |
 | `illustrated-warm` | 工具使用体验 / 讲故事 / 暖色指南 | 中 |
 | `xiaohongshu-colorful` | 生活提示 / 清单 / 轻话题 | 中 |
-| `quote-card-minimal` | 金句卡(只支持贴图模式) | **低** |
 | `magazine-editorial` | 深度评论 / 专栏长文 | 中 |
 | `knowledge-card` | 教程 / 方法论 / 复习卡 | 中 |
 | `data-chart` | 数据观察 / 行业报告 / 对比 | 中(图表为主) |
@@ -406,7 +405,7 @@ Claude 明确说:"现在进入人味化改写 pass"。对骨架稿**逐段**过�
 
 **何时用 infographic 系列 vs 低密度老风格?**
 
-| 判据 | 用 infographic-* | 用 tech-card-blue / quote-card-minimal |
+| 判据 | 用 infographic-* | 用 marker-*(刷体大字卡) |
 |---|---|---|
 | 贴图模式(newspic)| ✅ **默认就走这个** | 仅在内容是单一金句时用 |
 | 要点里有具体数字 / 产品版本 / 对比 / 时间 | ✅ | ❌ |
@@ -417,7 +416,7 @@ Claude 明确说:"现在进入人味化改写 pass"。对骨架稿**逐段**过�
 
 **⚠️ 重要提醒**:
 - infographic 系列需要 **brief.md 的要点里有具体信息**(数字、名词、对比、步骤名),AI 才能把子点渲染成真内容。要点越具体,生成的信息图越真实。
-- 如果要点只是一句抽象观点,AI 会在子卡里编数据 —— 那种情况下不如直接用 `tech-card-blue` 做极简大字卡更稳。
+- 如果要点只是一句抽象观点,AI 会在子卡里编数据 —— 那种情况下不如直接用 `marker-lime` 做刷体大字卡更稳。
 
 每种风格的预览图、完整 prompt 模板、适用场景见 [`assets/image-styles/README.md`](assets/image-styles/README.md)。
 
@@ -833,7 +832,7 @@ python3 scripts/publish.py --account main --type newspic --brief brief.md --imag
 - 微信最多 20 张图,建议 5-10 张,低于 2 张会警告
 - 不支持多平台同步(`--sync` / `--sync-from-config`)
 - 不支持行内标色、HTML 主题 —— 短文本只是一段纯文本
-- 不建议配 `quote-card-minimal` 以外的过重装饰 + 长句,**卡面字数超过 20 字会影响阅读**
+- 建议用 `marker-*` 极简大字卡,避免过重装饰 + 长句,**卡面字数超过 20 字会影响阅读**
 
 ---
 

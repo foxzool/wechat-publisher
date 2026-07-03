@@ -9,7 +9,7 @@
 
 ---
 
-## 🖼️ 风格画廊(19 种内置风格)
+## 🖼️ 风格画廊(22 种内置风格)
 
 > 全部预览图都用同一主题「Claude Code /rewind」渲染,方便横向对比。点缩略图可跳到对应「详细说明」。按视觉家族分组:
 
@@ -38,18 +38,25 @@
 </tr>
 </table>
 
-### 🗂️ 卡片排版系 · 大字 + 结构(5)
+### 🖊️ 荧光刷体大字卡系 · 白底刷体 + 荧光高亮(5,**卡片默认**)
 
 <table>
 <tr>
-<td align="center" valign="top" width="33%"><a href="#tech-card-blue"><img src="previews/tech-card-blue.webp" width="230" alt="tech-card-blue"/></a><br/><b><code>tech-card-blue</code></b><br/><sub>浅蓝底 + 深蓝大字 + 极简</sub></td>
+<td align="center" valign="top" width="20%"><a href="#marker-lime"><img src="previews/marker-lime.webp" width="150" alt="marker-lime"/></a><br/><b><code>marker-lime</code></b> ⭐<br/><sub>荧光黄绿 + 宝蓝(默认)</sub></td>
+<td align="center" valign="top" width="20%"><a href="#marker-pink"><img src="previews/marker-pink.webp" width="150" alt="marker-pink"/></a><br/><b><code>marker-pink</code></b><br/><sub>樱粉 + 青绿</sub></td>
+<td align="center" valign="top" width="20%"><a href="#marker-sky"><img src="previews/marker-sky.webp" width="150" alt="marker-sky"/></a><br/><b><code>marker-sky</code></b><br/><sub>天蓝 + 亮橙</sub></td>
+<td align="center" valign="top" width="20%"><a href="#marker-coral"><img src="previews/marker-coral.webp" width="150" alt="marker-coral"/></a><br/><b><code>marker-coral</code></b><br/><sub>珊瑚橙 + 靛蓝</sub></td>
+<td align="center" valign="top" width="20%"><a href="#marker-violet"><img src="previews/marker-violet.webp" width="150" alt="marker-violet"/></a><br/><b><code>marker-violet</code></b><br/><sub>藕紫 + 玫红</sub></td>
+</tr>
+</table>
+
+### 🗂️ 卡片排版系 · 大字 + 结构(3)
+
+<table>
+<tr>
 <td align="center" valign="top" width="33%"><a href="#knowledge-card"><img src="previews/knowledge-card.webp" width="230" alt="knowledge-card"/></a><br/><b><code>knowledge-card</code></b><br/><sub>白底 + 编号徽章 + 结构化</sub></td>
 <td align="center" valign="top" width="33%"><a href="#magazine-editorial"><img src="previews/magazine-editorial.webp" width="230" alt="magazine-editorial"/></a><br/><b><code>magazine-editorial</code></b><br/><sub>米色 + 衬线大标题 + 栏位感</sub></td>
-</tr>
-<tr>
-<td align="center" valign="top" width="33%"><a href="#quote-card-minimal"><img src="previews/quote-card-minimal.webp" width="230" alt="quote-card-minimal"/></a><br/><b><code>quote-card-minimal</code></b><br/><sub>黑白 + 衬线 + 极致留白(仅贴图)</sub></td>
 <td align="center" valign="top" width="33%"><a href="#xiaohongshu-colorful"><img src="previews/xiaohongshu-colorful.webp" width="230" alt="xiaohongshu-colorful"/></a><br/><b><code>xiaohongshu-colorful</code></b><br/><sub>暖色渐变 + emoji + 大字</sub></td>
-<td align="center" valign="top" width="33%"></td>
 </tr>
 </table>
 
@@ -115,11 +122,14 @@ accounts:
 | [`morandi`](#morandi) | 细黑线 + 莫兰迪灰调(手账手写) | 人文、随笔、深度评论、有质感的内容 | 中 | ✅ | ✅ |
 | [`mint`](#mint) | 细黑线 + 薄荷绿/天蓝(清爽冷调,手账) | 生产力、工具、效率、清单 | 中 | ✅ | ✅ |
 | [`blue`](#blue) | 细黑线 + 蓝调 + 橙点缀(冷静偏技术,手账) | 技术、架构、协议、SDK、评测 | 中 | ✅ | ✅ |
-| [`tech-card-blue`](#tech-card-blue) | 浅蓝底 + 大字 + 极简 | 技术技巧、命令讲解、短观点 | 低 | ✅ | ✅ |
+| [`marker-lime`](#marker-lime) ⭐ | 白底刷体大字 + 荧光黄绿高亮 + 宝蓝强调 | 标题党、爆点、热评、金句、短观点(**卡片默认**) | 低 | ✅ | ✅ |
+| [`marker-pink`](#marker-pink) | 白底刷体大字 + 樱粉高亮 + 青绿强调 | 同上,樱粉配色 | 低 | ✅ | ✅ |
+| [`marker-sky`](#marker-sky) | 白底刷体大字 + 天蓝高亮 + 亮橙强调 | 同上,天蓝配色 | 低 | ✅ | ✅ |
+| [`marker-coral`](#marker-coral) | 白底刷体大字 + 珊瑚橙高亮 + 靛蓝强调 | 同上,珊瑚配色 | 低 | ✅ | ✅ |
+| [`marker-violet`](#marker-violet) | 白底刷体大字 + 藕紫高亮 + 玫红强调 | 同上,藕紫配色 | 低 | ✅ | ✅ |
 | [`hand-drawn-blue`](#hand-drawn-blue) | 手绘线条 + 蓝点缀 | 概念解释、架构图、流程图(全能选手) | 中 | ✅ | ✅ |
 | [`illustrated-warm`](#illustrated-warm) | 暖橙 + 卡通人物 + 气泡 | 体验讲解、使用指南、亲切感强的技巧 | 中 | ✅ | ✅ |
 | [`xiaohongshu-colorful`](#xiaohongshu-colorful) | 暖色渐变 + emoji + 大字 | 生活提示、上手指南、清单类 | 中 | ✅ | ✅ |
-| [`quote-card-minimal`](#quote-card-minimal) | 黑白 + 衬线 + 留白 | 金句、观点、哲思 | 低 | ✅ | ❌ |
 | [`magazine-editorial`](#magazine-editorial) | 米色 + 衬线 + 栏位感 | 深度评论、专栏、长篇随笔 | 中 | ✅ | ✅ |
 | [`knowledge-card`](#knowledge-card) | 白底 + 编号 + 结构化 | 教程、方法论、清单、复习卡 | 中 | ✅ | ✅ |
 | [`data-chart`](#data-chart) | 白底 + 图表 + 数字 | 数据观察、行业报告、对比 | 中 | ✅ | ✅ |
@@ -152,7 +162,7 @@ accounts:
 - 前沿模型 / 基建 / 赛博 / 深夜科技 → `infographic-dark`(深夜档案)
 - 生产力 / 工具 / 方法论 / 学习笔记 → `infographic-mint`(薄荷清新)
 
-**⚠️ 使用前提**:要点本身要有具体信息(数字、名词、对比、步骤),AI 才能把子点渲染成 2×2 网格里的真内容。如果要点只有一句抽象观点,AI 会编数字 —— 那种情况下不如用 `tech-card-blue` 做极简大字卡更稳。
+**⚠️ 使用前提**:要点本身要有具体信息(数字、名词、对比、步骤),AI 才能把子点渲染成 2×2 网格里的真内容。如果要点只有一句抽象观点,AI 会编数字 —— 那种情况下不如用 `marker-lime` 做刷体大字卡更稳。
 
 ---
 
@@ -234,7 +244,7 @@ accounts:
 
 ### blue
 
-细黑线手绘 + 手写体标题 + 蓝调(蓝+浅蓝+橙点缀)。冷静、偏工程,适合技术、架构、协议、SDK、评测(走手账手写,替代旧的印刷感 `tech-card-blue` 在'技术冷静'场景的定位)。
+细黑线手绘 + 手写体标题 + 蓝调(蓝+浅蓝+橙点缀)。冷静、偏工程,适合技术、架构、协议、SDK、评测(走手账手写,冷静偏工程的技术话题首选)。
 
 <table>
 <tr><td width="300">
@@ -249,21 +259,72 @@ accounts:
 
 ---
 
-### tech-card-blue
+### 荧光刷体大字卡系(marker-*)⭐ 卡片默认
 
-浅蓝底 + 深蓝大字 + 极少装饰。**对标微信示例文章 [Claude Code /rewind](https://mp.weixin.qq.com/s/erEF74HRGkrBPxTGsKDsSQ)**。
-每张卡一个观点或一条命令,字体占视觉主导,留白充足。
+白底 + 粗刷体大字(干笔飞白)+ 一道荧光笔高亮压在关键行 + 单个关键词强调色,居中大留白。纯文字大字卡,标题党 / 爆点 / 热评气质,手作感强。**取代旧的 `tech-card-blue` / `quote-card-minimal` 两款极简大字卡**,作为卡片类推荐默认(`tech` 账号 `image_style` 默认已切到 `marker-lime`)。
+
+**共享 DNA / 四条铁律**:①字号分层——小引子行 ≈ 大字的 55%,大爆点 2-3 行紧凑成块;②文字块居中、上下留大片白,不铺满;③全卡只一道**干刷、有笔触条纹、边缘毛糙半透明**的荧光高亮,只压第一行大字;④只一个词上强调色,其余近黑 `#1a1a1a`,白底不铺色不加框。5 个变体只换「高亮色 + 强调色」这一对。
+
+> **⚠️ 字体一致**:纯文字卡最吃字体,模型渲染中文会飘、刷体难稳。要真·一致就走「白底只出高亮 + 版式,文字用固定刷体后期叠」(中文汉仪雅酷黑 / 站酷庆科黄油体,英文 Permanent Marker / Caveat)。一步到位出字时,卡面控制在 ≤14 字、短句分行,出错率更低。
+
+#### marker-lime
+
+⭐ **卡片类推荐默认 + `tech` 账号 `image_style` 默认**。
 
 <table>
 <tr><td width="300">
-<img src="previews/tech-card-blue.webp" alt="tech-card-blue preview" />
+<img src="previews/marker-lime.webp" alt="marker-lime preview" />
 </td><td>
 
-- **主题色**:`#f4f7ff` 底 / `#2e5bff` 蓝 / `#0b1530` 墨
-- **排版**:正方 1:1,思源黑体 Heavy
-- **账号绑定**:`tech`(蒜是哪根葱)默认
-- **最适合**:技术命令讲解、开发者 tips、短观点
-- **别用在**:长文深度解析(信息密度不够)
+- **配色**:高亮 荧光黄绿 `#cfe84a` + 强调 矢车菊蓝 `#3a6fe5` / 近黑 `#1a1a1a` / 白底 `#ffffff`
+- **排版**:3:4 贴图 / 4:3 文章,粗刷体中文 + 随性手写拉丁
+- **账号绑定**:`tech`(蒜是哪根葱)默认;卡片类全局推荐默认
+- **最适合**:标题党、爆点、热评、金句、短观点
+- **别用在**:长文深度解析、需要人物场景(换 `slice-of-life`)、高密度信息(换 `infographic-*`)
+
+</td></tr></table>
+
+#### marker-pink
+
+<table><tr><td width="240">
+<img src="previews/marker-pink.webp" alt="marker-pink preview" />
+</td><td>
+
+- **配色**:高亮 樱粉 `#ffb6ce` + 强调 青绿 `#17a67a`
+- 其余同 `marker-lime`(白底刷体大字 + 一道高亮 + 单词强调 + 大留白)
+
+</td></tr></table>
+
+#### marker-sky
+
+<table><tr><td width="240">
+<img src="previews/marker-sky.webp" alt="marker-sky preview" />
+</td><td>
+
+- **配色**:高亮 天蓝 `#a9def9` + 强调 亮橙 `#f97316`
+- 其余同 `marker-lime`
+
+</td></tr></table>
+
+#### marker-coral
+
+<table><tr><td width="240">
+<img src="previews/marker-coral.webp" alt="marker-coral preview" />
+</td><td>
+
+- **配色**:高亮 珊瑚橙 `#ffc4a3` + 强调 靛蓝 `#4f46e5`
+- 其余同 `marker-lime`
+
+</td></tr></table>
+
+#### marker-violet
+
+<table><tr><td width="240">
+<img src="previews/marker-violet.webp" alt="marker-violet preview" />
+</td><td>
+
+- **配色**:高亮 藕紫 `#d9c2f0` + 强调 玫红 `#e11d6b`
+- 其余同 `marker-lime`
 
 </td></tr></table>
 
@@ -283,7 +344,7 @@ accounts:
 - **排版**:支持 1:1 贴图 / 16:9 文章,手写风字体
 - **账号绑定**:`main`(刷屏AI)默认
 - **最适合**:AI / 产品 / 工程话题的全能默认
-- **别用在**:纯数据报告(换 `data-chart`)、纯金句(换 `quote-card-minimal`)
+- **别用在**:纯数据报告(换 `data-chart`)、纯金句大字(换 `marker-lime`)
 
 </td></tr></table>
 
@@ -329,26 +390,6 @@ accounts:
 
 ---
 
-### quote-card-minimal
-
-黑白极简 + 衬线大字 + 留白极致。一张卡一句金句,像美术馆墙上的引文。
-**只推荐贴图模式**,文章内联用会太冷清。
-
-<table>
-<tr><td width="300">
-<img src="previews/quote-card-minimal.webp" alt="quote-card-minimal preview" />
-</td><td>
-
-- **主题色**:`#f7f5f0` 米白 / `#1a1a1a` 墨黑 / `#8a8a8a` 灰
-- **排版**:1:1,思源宋体 Heavy
-- **账号绑定**:(tech 号葱哥最适合)
-- **最适合**:观点金句、哲思、收尾页、单独一句话
-- **别用在**:多信息卡(一张塞不下超过 15 字的会崩)
-
-</td></tr></table>
-
----
-
 ### magazine-editorial
 
 米色暖底 + 衬线大标题 + 栏位感 + 栗色点缀。像杂志内页,有温度也有距离感。
@@ -383,7 +424,7 @@ accounts:
 - **排版**:3:4(贴图)/ 16:9(文章),思源黑体 Bold
 - **账号绑定**:(工具教程、方法论类用)
 - **最适合**:教程步骤、方法框架、清单、概念拆解
-- **别用在**:情绪型内容、纯金句(两者都换 `quote-card-minimal`)
+- **别用在**:情绪型内容、纯金句大字(换 `marker-lime`)
 
 </td></tr></table>
 
@@ -463,7 +504,7 @@ accounts:
 - **视觉语言**:手绘水彩 + 墨线 + 纸张纹理,绝不用 flat vector / 3D
 - **设计**:按内容选择布局和元素;可有人物/机器人,也可用图表、流程、设备或抽象符号
 - **最适合**:贴图模式默认、AI 产品、工具讲解、人文趋势、通用话题
-- **别用在**:如果你只想要一句金句大字卡(用 `quote-card-minimal`)
+- **别用在**:如果你只想要一句大字标题卡(用 `marker-lime`)
 
 </td></tr></table>
 
@@ -549,7 +590,7 @@ accounts:
 python3 scripts/wechat_api.py list-image-styles
 
 # 看某个风格的完整 JSON
-cat assets/image-styles/tech-card-blue.json | python3 -m json.tool
+cat assets/image-styles/marker-lime.json | python3 -m json.tool
 
 # 单独跑拆卡 + 出图计划(不实际生图)
 python3 scripts/newspic_build.py brief.md --dry-run

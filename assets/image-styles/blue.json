@@ -36,5 +36,5 @@
     "article_inline": "Generate a clean hand-drawn editorial illustration in Chinese with a 手账 / handwritten-notebook feel, 16:9 landscape. Topic: '{image_subject}'. Cream / soft white background, generous white space. THIN, confident hand-drawn BLACK ink line-art (NOT thick); cartoon people have SOLID BLACK hair, dot-eye faces and light hoodies. Bold BLACK HAND-LETTERED headings (hand-written, not printed sans-serif). Use a BLUE scheme: blue (#4a6cf7) primary accent with light-blue (#a9c2f5) washes for card and icon fills, one small orange (#ff8c42) accent — clean, calm, a bit techy. Good for code windows, diagrams, comparison cards. Keep the 手账 feel — hand-lettered, tidy, airy. No photos, no 3D, no heavy gradients, no dark background."
   },
   "example_reference": "(蓝+浅蓝+橙点缀的冷静技术感手账插画:细黑线 + 手写标题)",
-  "notes": "和其它几套同一套手绘+手写+细线 treatment,只换配色。蓝调适合技术/架构/协议/SDK/评测。替代了旧的 tech-card-blue 在'技术冷静'场景的定位(但走手账手写,不是印刷黑体)。与 x-publisher 的 blue 同名同风格,跨 skill 复用。"
+  "notes": "和其它几套同一套手绘+手写+细线 treatment,只换配色。蓝调适合技术/架构/协议/SDK/评测。冷静偏工程的技术话题首选(走手账手写,不是印刷黑体)。与 x-publisher 的 blue 同名同风格,跨 skill 复用。"
 }

@@ -340,7 +340,7 @@ def resolve_image_style(
         cfg = get_config(account_name)
         # 贴图模式优先使用账号的 newspic_image_style(如果配了),否则回退到全局 newspic 兜底。
         # 账号级别的 image_style 是给文章模式用的,不直接用于贴图模式 —— 文章手绘线条风
-        # (hand-drawn-blue / tech-card-blue)和贴图的高密度水彩信息图是两种完全不同的视觉语言。
+        # (hand-drawn-blue / marker-lime)和贴图的高密度水彩信息图是两种完全不同的视觉语言。
         if mode == "newspic":
             if cfg.get("newspic_image_style"):
                 return get_image_style(cfg["newspic_image_style"])

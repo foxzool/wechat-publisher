@@ -22,7 +22,7 @@ brief.md 格式示例:
 
     ---
     topic: "Claude Code /rewind 命令"
-    image_style: tech-card-blue    # 可选,不写就用账号默认或 hand-drawn-blue
+    image_style: marker-lime    # 可选,不写就用账号默认或 hand-drawn-blue
     card_count: 6                  # 可选,不写就跟要点数走
     title: "Claude Code 里,最有用的命令之一"
     account: main
@@ -50,7 +50,7 @@ prompt 模板中可用的变量占位符(由 build_card_plan 替换):
     {card_total}    — 卡片总数,两位数字如 "06"
     {image_subject} — "topic - card_main" 拼接,兼容老风格
 
-tech-card-blue / data-chart 等旧风格只用 card_main/card_sub,
+marker-* / data-chart 等风格只用 card_main/card_sub,
 infographic-blue / -warm / -dark / -mint 新风格用 point_full + card_index 做高密度信息图。
 """
 

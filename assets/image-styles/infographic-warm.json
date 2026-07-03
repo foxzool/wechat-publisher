@@ -54,5 +54,5 @@
     "article_inline": "Generate a hand-drawn watercolor + ink Chinese infographic illustration, 16:9 landscape. Topic: '{image_subject}'. Make it high-density but readable: clear Chinese title, 3-5 structured information blocks, arrows/labels/mini chart/diagram as needed, and content-specific hand-drawn illustration elements. Warm cream editorial palette is a starting point, but adapt colors and layout to the topic. Characters are optional; use people, robot, device, chart, object metaphor, or abstract icons only when useful. No fixed template, no flat vector, no 3D, no photos."
   },
   "example_reference": "https://mp.weixin.qq.com/s/nSlGjh9hjM63jxz_jgUCwA",
-  "notes": "**贴图模式的默认风格**。4 种 infographic-* 共享的是高密度手绘信息图原则,不是固定角色或固定版式。要点内容越具体,AI 渲染出的信息图越真实(数字、版本号、对比、步骤名都会被渲染成子卡片的文字);如果要点只是一句抽象观点,AI 会编具体内容,不如用 `tech-card-blue` 简单风格。"
+  "notes": "**贴图模式的默认风格**。4 种 infographic-* 共享的是高密度手绘信息图原则,不是固定角色或固定版式。要点内容越具体,AI 渲染出的信息图越真实(数字、版本号、对比、步骤名都会被渲染成子卡片的文字);如果要点只是一句抽象观点,AI 会编具体内容,不如用 `marker-lime` 简单风格。"
 }
