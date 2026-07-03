@@ -284,6 +284,10 @@ accounts:
 
 </td></tr></table>
 
+**纯净模板参考**(展示风格骨架:小引子 + 高亮首行 + 大字分行,不带具体文案):
+
+<img src="previews/marker-lime-template.webp" alt="marker-lime clean template" width="240" />
+
 #### marker-pink
 
 <table><tr><td width="240">
