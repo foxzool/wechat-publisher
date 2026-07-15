@@ -171,40 +171,12 @@ pip install requests pyyaml --break-system-packages 2>/dev/null || pip install r
 
 目标:按结构写出初稿。**允许这一稿有 AI 味**,下一阶段专门负责"人味化"。
 
-#### 结构选择规则
+#### 结构选择规则与结构库(概览)
 
-不要每篇都用"我遇到一件事"式故事开场。故事只是可选结构之一,不是默认套路。
-
-1. 用户在指令或 frontmatter 里写了 `article_structure` / `opening_hook` → 直接使用。
-2. 题材明显时按下表自动匹配。
-3. 题材不明显时,从最贴近的 2-3 个候选里随机选一个。
-4. 同一批次 / 同一账号连续发文时,优先避开最近一篇用过的结构。
-5. 选定后写入 `brief.md`,便于后续复盘和避免风格重复。
-
-#### 文章结构库
-
-| `article_structure` | 适合题材 | 开头钩子 | 正文推进 |
-|---|---|---|---|
-| `data-first` 数据砸脸 | 榜单 / benchmark / 融资 / 财报 / 模型能力 | 直接甩一个反常数字或排名 | 数字是什么 → 谁做的 → 为什么可信 → 对行业意味着什么 → 我的判断 |
-| `question-led` 问题追踪 | 争议 / 真假难辨 / 产品变化 / 用户困惑 | 抛一个具体问题 | 问题从哪来 → 证据 A/B → 哪些已确认 → 哪些存疑 → 结论边界 |
-| `contrarian` 反常识 | 舆论一边倒但事实更复杂 | 先说一个和直觉相反的判断 | 大家怎么想 → 为什么不完全对 → 关键证据 → 重新理解 → 后续影响 |
-| `teardown` 拆解地图 | 新框架 / 新协议 / Agent 架构 / SDK | 先给一张结构图或一句"它其实只分三层" | 总览 → 分层拆解 → 关键设计取舍 → 和旧方案对比 → 适用边界 |
-| `field-notes` 实测笔记 | 工具体验 / 教程 / 踩坑 / 本机实验 | 从一条命令、日志、失败结果切入 | 我试了什么 → 怎么跑 → 哪里顺 → 哪里坑 → 给读者的用法建议 |
-| `timeline-news` 时间线 | 热点新闻 / 公司动作 / 政策 / 安全事故 | 用具体时间点或事件链开场 | 发生了什么 → 时间线 → 关键角色 → 影响范围 → 接下来盯什么 |
-| `playbook` 行动清单 | 方法论 / 技巧合集 / 入门指南 / 生产力 | 先给结果承诺或适用人群 | 适合谁 → 最短路径 → 3-5 个关键动作 → 常见坑 → 何时不该用 |
-| `case-file` 案卷复盘 | 翻车 / 处罚 / 安全事件 / 商业事故 | 用"案情摘要"或核心矛盾开场 | 案件事实 → 证据链 → 错在哪里 → 反方解释 → 对普通人的启发 |
-
-#### 开头钩子库
-
-| `opening_hook` | 写法 | 避免 |
-|---|---|---|
-| `hard-number` | 第一屏出现具体数字、金额、比例、版本号 | 数字后面空泛感慨 |
-| `sharp-question` | 用一个读者真会问的问题开场 | 连续自问自答三四句 |
-| `contradiction` | 把两个冲突事实并排放出来 | 为反转而反转 |
-| `quote-first` | 用当事人原话 / issue / commit message 开场 | 编造无法溯源的"有人说" |
-| `artifact-first` | 用命令输出、日志、截图描述、排行榜条目开场 | 贴一大段无解释的技术细节 |
-| `timeline-first` | 用具体日期 / 小时时间线开场 | 宏观时代背景 |
-| `scene-first` | 用个人经历或具体场景开场 | 每篇都这样写;故事必须短,不要铺陈 |
+- 不要每篇都用"我遇到一件事"式故事开场;用户指定 `article_structure` / `opening_hook` 就照做,否则按题材匹配、多候选随机、连发时避开上一篇用过的结构,选定后写入 `brief.md`
+- `article_structure` 共 8 种:data-first / question-led / contrarian / teardown / field-notes / timeline-news / playbook / case-file
+- `opening_hook` 共 7 种:hard-number / sharp-question / contradiction / quote-first / artifact-first / timeline-first / scene-first
+- 完整选择规则、每种结构的适合题材与正文推进、每种钩子的写法与避免项,详见 [references/article-structures.md](references/article-structures.md)
 
 #### 默认骨架(Markdown)
 
@@ -283,73 +255,11 @@ pip install requests pyyaml --break-system-packages 2>/dev/null || pip install r
 
 Claude 自己扮演"反 AI 检测审校"的角色,对骨架稿做 **9 条强制清单** 检查,逐项改写。
 
-#### 反 AI 检测强制清单(写完后逐条过)
+#### 反 AI 检测强制清单(概览)
 
-**① Burstiness(句长抖动)**
-- 相邻三句的字数差必须出现至少一次 **>15 字**。
-- 每写 3-4 个长句,强制插入一个 **5-12 字的短句**。例如:"对。""我当时愣住了。""这事挺离谱。""先别急。"
-- 禁止连续 4 句都是 25-40 字的"标准长句"。
+9 条强制项:① Burstiness(句长抖动) ② 句式多样性禁用词清单 ③ AI 高频词黑名单 ④ 开头破冰规则 ⑤ 人称和立场 ⑥ 事实密度 ⑦ 标点多样性 ⑧ 结构的"不完美" ⑨ 按账号 voice 再过滤。
 
-**② 句式多样性 —— 禁用词清单**
-在最终稿中全文搜索以下词,**命中 >1 次必须替换或删除**:
-```
-首先/其次/最后   不仅...而且   一方面...另一方面
-值得一提的是     不可否认       毋庸置疑
-综上所述         总而言之       由此可见
-众所周知         不难发现       显而易见
-在...的背景下    随着...的发展  站在...的角度
-让我们一起来     归根结底       无论如何
-```
-
-**③ AI 高频词黑名单**
-全文搜索以下词,**命中 >2 次必须替换**:
-```
-赋能 / 打造 / 聚焦 / 深度融合 / 生态 / 闭环 / 链路 / 抓手 /
-价值链 / 护城河 / 方法论 / 底层逻辑 / 生态位 / 结构化思维 /
-提升效率 / 助力 / 全链路 / 一站式 / 端到端 / 量变到质变 /
-引领 / 颠覆 / 革命性 / 前所未有 / 核心竞争力 / 范式 /
-降本增效 / 数字化转型 / 产业升级 / 破局 / 出圈 / 沉淀 /
-深耕 / 蓝图 / 新篇章
-```
-
-**④ 开头破冰规则**
-第一段**禁止**从宏观背景切入("近年来..."、"随着...的发展...")。改为:
-- 一个具体场景("上周三下午 4 点,我正在...")
-- 一个具体数字("我给一篇 5000 字的稿子配图花了 2 小时 47 分...")
-- 一句具体的话("同事昨天跟我说:'你这个工具能开源吗?'")
-- 一个具体的人物("OpenAI 的 Greg Brockman 在周六凌晨发了一条 tweet...")
-- 一个具体问题("为什么 83.6% 反而让我更担心?")
-- 一条具体证据("日志里只有 7 行,但问题就藏在第 4 行。")
-- 一组冲突事实("它免费开源,但反爬成功率比商业服务低 28 个点。")
-
-**⑤ 人称和立场**
-- 全文**必须**出现 ≥3 次第一人称("我")的主观表达,包含:个人经历 / 判断 / 失败 / 困惑。
-- 允许不确定表达:"我可能说错了"、"我还没完全想明白"、"这只是我的感觉"、"存疑"。
-- 禁止全程"全知冷静陈述"。
-
-**⑥ 事实密度**
-每 500 字内必须有 **≥1 个具体数字或专有名词**(时间 / 金额 / 版本号 / 人名 / 产品名 / 地名)。禁止"很多"、"大量"、"据说"、"相关研究表明"。
-
-**⑦ 标点多样性**
-全文必须出现:
-- 破折号 `——` ≥1 次(用于插入语或强调)
-- 问号 ≥2 次(包括设问句)
-- 括号插入 `(...)` ≥1 次
-- 省略号 `...` ≤3 次(多了也是 AI 味)
-禁止整篇只有句号和逗号。
-
-**⑧ 结构的"不完美"**
-允许并鼓励:
-- 在某一小节末尾补"扯远了,回到主题"
-- 反悔句:"上面这点我收回,想了一下其实..."
-- 自嘲:"写到这里我自己都怀疑我在扯淡"
-- 小节长度明显不对称
-这些是真人写作的天然痕迹,AI 默认不会产生。
-
-**⑨ 按账号 voice 做语气再一次过滤**
-按当前账号的 voice 字段,把句子整体语气再过一遍:
-- main(飞哥):增加"这事儿"、"说实话"等北京口语(**禁用"我跟你讲""我跟你说"这类对读者喊话的口头语**)
-- tech(葱哥):删除所有感叹号,增加"这破玩意"、"讲真"、"其实挺简单的"等冷吐槽
+每条的具体阈值、完整禁用词表和改写示例,改写时**必须逐条对照** [references/anti-ai-checklist.md](references/anti-ai-checklist.md),不能只看本概览。
 
 #### 执行方式
 
@@ -370,55 +280,29 @@ Claude 明确说:"现在进入人味化改写 pass"。对骨架稿**逐段**过�
    python3 scripts/wechat_api.py list-image-styles
    ```
 
-| 风格 | 最适合 | 卡面密度 |
-|---|---|---|
-| `hand-drawn-blue` | AI / 产品 / 工程类通用(默认) | 中 |
-| `marker-lime`(+pink/sky/coral/violet)| 刷体大字标题卡 / 爆点 / 热评 / 金句 / 短观点(**卡片默认**)| **低** |
-| `illustrated-warm` | 工具使用体验 / 讲故事 / 暖色指南 | 中 |
-| `xiaohongshu-colorful` | 生活提示 / 清单 / 轻话题 | 中 |
-| `magazine-editorial` | 深度评论 / 专栏长文 | 中 |
-| `knowledge-card` | 教程 / 方法论 / 复习卡 | 中 |
-| `data-chart` | 数据观察 / 行业报告 / 对比 | 中(图表为主) |
-| `meme-illustration` | 吐槽 / 行业段子(慎用) | 低 |
-| **`infographic-warm`** ⭐ | **手绘水彩信息图 · 暖黄(贴图默认,对标参考图)** | **高** |
-| **`infographic-blue`** | **手绘水彩信息图 · 冷蓝(SDK/协议/产品拆解)** | **高** |
-| **`infographic-dark`** | **手绘水彩信息图 · 深夜(前沿模型/基建/赛博)** | **高** |
-| **`infographic-mint`** | **手绘水彩信息图 · 薄荷(生产力/方法论/工具)** | **高** |
+#### 风格详表与手绘水彩信息图系列(概览)
 
-### ⭐🔥 手绘水彩信息图系列(v4 · **贴图模式默认**)
+- 文章内联默认 `hand-drawn-blue`;`marker-lime`(+pink/sky/coral/violet)适合刷体大字金句卡;另有 `illustrated-warm` / `xiaohongshu-colorful` / `magazine-editorial` / `knowledge-card` / `data-chart` / `meme-illustration`
+- **`infographic-warm/blue/dark/mint`** 手绘水彩信息图系列(v4):高密度中文信息图 + 手绘水彩墨线,9:16 竖版,**贴图模式默认**(warm)
+- 要点里有具体数字 / 对比 / 多层信息 → 用 `infographic-*`;单一观点或金句、大字留白 → 用 `marker-*`
+- 全部风格的适用场景、卡面密度、共享视觉原则与选择判据,详见 [references/image-styles-guide.md](references/image-styles-guide.md)
+- 每种风格的预览图、完整 prompt 模板、适用场景见 [`assets/image-styles/README.md`](assets/image-styles/README.md)
 
-这是一组**中文高密度手绘信息图**风格(NOT Bloomberg flat vector,NOT 3D),像一页日本/台湾科普绘本或杂志插页。核心只固定三件事:高信息密度、手绘水彩/墨线质感、中文信息结构清晰。
+#### 排版卡(typeset-card)—— 代码渲染的排版海报卡(手绘之外的第二条路)
 
-**共享视觉原则**(不要固定套版):
-- 9:16 竖版 1080x1920
-- **手绘水彩 + 墨线**,软纸张纹理、淡笔触
-- **高密度信息图**,每张卡必须有明确标题、解释层、结构化要点和可视化关系
-- 配色、布局、角色、图标、装饰元素都要按主题调整,不要每张都套同一个模板
-- 可选元素:顶部标签、主标题、副标题、场景插画、流程路径、终端条、2×2 网格、对比栏、时间线、数据小图表、胶囊标签、页脚水印
-- 角色不是必需项。机器人、男孩、人物、动物、设备、抽象图形都可以用;只有当内容需要"讲故事/场景化"时才放角色
+`generate_image` 的手绘水彩会把中文和数字糊掉。**只要图里有必须一字不差的文字**(新闻 changelog、数据、
+金句原文、@handle、对比),或题材偏严肃(讣告、争议、反网暴),就改走排版卡:手写 HTML/CSS → 无头
+Chrome 2× 截图,文字精确、能上品牌色。四套配色:`ink`(挽联)/ `signal`(广播)/ `terminal`(终端新闻)/ `versus`(对比)。
 
-**4 种默认氛围只是起点,不是硬约束**:
-- ⭐ **`infographic-warm`**(**默认**)—— 暖色、通用、AI 产品、工具、人文观察
-- **`infographic-blue`** —— 冷静、技术、SDK/协议/基建/商务拆解
-- **`infographic-dark`** —— 深色、前沿模型、安全、赛博、夜间研究感
-- **`infographic-mint`** —— 清新、生产力、方法论、工具、学习笔记
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=2 \
+  --window-size=1080,1350 --screenshot=out.png "file:///abs/card.html"
+python3 scripts/image_handler.py upload out.png   # 拿 CDN URL;封面走 publish.py --cover
+```
 
-**何时用 infographic 系列 vs 低密度老风格?**
-
-| 判据 | 用 infographic-* | 用 marker-*(刷体大字卡) |
-|---|---|---|
-| 贴图模式(newspic)| ✅ **默认就走这个** | 仅在内容是单一金句时用 |
-| 要点里有具体数字 / 产品版本 / 对比 / 时间 | ✅ | ❌ |
-| 每条要点 20 字以上,包含多层信息 | ✅ | ❌ |
-| 内容是单一观点或金句 | ❌ | ✅ |
-| 希望每张卡像杂志内页 | ✅ | ❌ |
-| 希望大字 + 留白的极简感 | ❌ | ✅ |
-
-**⚠️ 重要提醒**:
-- infographic 系列需要 **brief.md 的要点里有具体信息**(数字、名词、对比、步骤名),AI 才能把子点渲染成真内容。要点越具体,生成的信息图越真实。
-- 如果要点只是一句抽象观点,AI 会在子卡里编数据 —— 那种情况下不如直接用 `marker-lime` 做刷体大字卡更稳。
-
-每种风格的预览图、完整 prompt 模板、适用场景见 [`assets/image-styles/README.md`](assets/image-styles/README.md)。
+起手式 `assets/typeset-card/template.html`;完整设计系统 + 坑(**渲染后必看,溢出会静默裁掉来源行**)见
+[`references/typeset-card.md`](references/typeset-card.md)。适合封面、newspic 金句 / 新闻首卡、需要精确数据的文内图。
 
 #### 配图数量
 
@@ -488,36 +372,9 @@ python3 scripts/html_converter.py article.md --theme refined-blue -o preview.htm
 
 #### 主题说明(共 15 套 · v2026)
 
-按文章气质分类挑选,不确定就用 main 默认的 `refined-blue`:
-
-| 类别 | 推荐主题 |
-|---|---|
-| **AI / 产品 / 深度分析** | `refined-blue` **(main 默认)** · `business-navy` · `sage-premium` |
-| **技术 / SDK / 工程** | `minimal-mono` **(tech 默认)** · `minimal-bw` · `academic-paper` |
-| **新闻 / 热点 / 速读** | `news-bold` · `warm-editorial` |
-| **人文 / 随笔 / 文化** | `ink-wash` · `elegant-ink` · `magazine-grid` |
-| **生活 / 美食 / 旅行** | `warm-orange` · `mint-fresh` · `sunset-coral` |
-| **时尚 / 美妆 / 情感** | `girly-pink` · `sunset-coral` |
-
-逐套视觉简介:
-
-| 主题 | 视觉 | 默认绑定 |
-|---|---|---|
-| `refined-blue` | 蓝调极简 + 精致层次 / 数字标号 / 渐变高亮 | **main**(刷屏AI) |
-| `minimal-mono` | 极简黑白 + 等宽字,工程师风 | **tech**(蒜是哪根葱) |
-| `minimal-bw` | 瑞士现代主义 · Helvetica,只用粗细 / 留白做层级 | (可选) |
-| `academic-paper` | 论文格式 + 衬线正字,章节编号式层级 | (可选) |
-| `business-navy` | 深蓝 + 金色点缀,权威克制的金融感 | (可选) |
-| `news-bold` | 红黑强对比 + 快节奏,信息密度高 | (可选) |
-| `warm-editorial` | 栗色暖调,衬线杂志风 | (可选) |
-| `ink-wash` | 米黄纸 + 朱砂宋体,中式留白美学 | (可选) |
-| `elegant-ink` | 墨黑 + 朱砂红,衬线现代宋体 | (可选) |
-| `magazine-grid` | 衬线大标题 + 大留白,杂志内页感 | (可选) |
-| `warm-orange` | 暖橙生活号,亲切日常感 | (可选) |
-| `mint-fresh` | 薄荷绿 + 圆角卡片,轻盈透气 | (可选) |
-| `sunset-coral` | 夕阳珊瑚,暖橙 + 奶白 | (可选) |
-| `sage-premium` | 鼠尾草墨绿,克制专业 | (可选) |
-| `girly-pink` | 粉紫渐变 + 可爱风,少女向 | (可选) |
+- main 默认 `refined-blue`(蓝调极简),tech 默认 `minimal-mono`(极简黑白等宽);不确定就用 `refined-blue`
+- 15 套按文章气质覆盖:AI 深度分析 / 技术工程 / 新闻热点 / 人文随笔 / 生活 / 时尚等类别
+- 按类别的推荐主题表与 15 套逐条视觉简介,详见 [references/themes.md](references/themes.md)
 
 **通过主题名选择**:在 `wechat-publisher.yaml` 里修改对应账号的 `theme:` 字段即可切换。例如把 main 账号换到 `sunset-coral`:
 
@@ -644,195 +501,24 @@ python3 scripts/publish.py --account tech --html article.html --cover cover.jpg 
 
 **默认不启用** —— 只有显式传参才触发,微信发布流程完全不受影响。同步失败也不影响已经创建好的微信草稿。
 
-#### 前置一次性安装
+- 底层基于 Wechatsync Chrome 扩展 + `@wechatsync/cli`,复用各平台已登录 Cookie,需一次性安装配置
+- 触发方式:`publish.py --sync zhihu,juejin,csdn` / `--sync-from-config` / `multi_publish.py` 独立跑
+- 同步走原始 markdown(微信 CDN 图有防盗链,其他平台加载不出);失败不回滚微信草稿,各平台均为草稿态,需用户登录二次确认
 
-底层基于 [Wechatsync](https://github.com/wechatsync/Wechatsync),复用 Chrome 扩展里各平台已登录的 Cookie,不经过任何第三方服务器。
-
-1. 装 Chrome 扩展「Wechatsync」,并分别登录知乎 / 掘金 / CSDN 等目标平台
-2. 扩展设置里打开「MCP 连接」,生成一个 Token 拷出来
-3. 装 CLI:
-   ```bash
-   npm install -g @wechatsync/cli
-   ```
-4. 在 `wechat-publisher.yaml` 里配置:
-   ```
-   integrations:
-     wechatsync_mcp_token: "<第二步拷出的 Token>"
-   ```
-5. 自检:
-   ```bash
-   python3 scripts/multi_publish.py --check
-   ```
-   两项都打 `✓` 说明就绪。
-
-#### 触发方式
-
-**方式 A:命令行显式指定平台(最常用)**
-```bash
-python3 scripts/publish.py --account main \
-  --input mp-articles/main/<slug>/article.md \
-  --cover mp-articles/main/<slug>/cover.jpg \
-  --sync zhihu,juejin,csdn
-```
-
-**方式 B:从账号配置读默认平台列表**
-
-先在 `wechat-publisher.yaml` 对应账号下加:
-```yaml
-accounts:
-  main:
-    ...
-    sync_platforms: [zhihu, juejin]
-```
-然后发布时加 `--sync-from-config`:
-```bash
-python3 scripts/publish.py --account main --input x.md --cover x.jpg --sync-from-config
-```
-
-**方式 C:独立跑(不发微信,只同步)**
-```bash
-python3 scripts/multi_publish.py --input x.md --platforms zhihu,juejin
-```
-
-#### 图片注意事项
-
-微信 CDN(`mmbiz.qpic.cn`)有严格防盗链,其他平台加载时会显示「此图片来自微信公众平台」占位图。
-因此同步走的是**原始 markdown**(`article.md`),不是已处理过的版本。
-
-- 外部 URL 图片(HTTPS):wechatsync 自动转存到各平台,通常没问题
-- 本地路径图片(比如 `mp-articles/main/<slug>/images/fig1.png`):wechatsync 的文档未明确是否支持
-  - `multi_publish.py` 会扫出并提示有多少张本地图
-  - 如果目标平台发现图加载不出来,需要把本地图先传到公开图床(或任何无防盗链的 CDN)、改成 URL 后再跑同步
-
-#### 失败处理
-
-- 同步失败**不回滚**微信草稿(微信草稿已在阶段六成功创建)
-- 告知用户:微信草稿 OK,但某平台同步失败 → 可以登录 Chrome 扩展手动重试
-- 各平台同步后都是「草稿」状态,**不会**直接公开发布,需要用户登录各平台二次确认
+一次性安装步骤、三种触发方式的完整命令、图片注意事项与失败处理,详见 [references/multi-platform-sync.md](references/multi-platform-sync.md)。
 
 ---
 
 ## 贴图模式(newspic / 图片消息,与文章模式并列)
 
-和上面 7 阶段的"图文"(news)流程**并列**的第二种发布形态。对标微信公众号的"图片消息":5-10 张图的**卡片墙** + 一段 100-300 字的**短描述**,适合:
+和上面 7 阶段的"图文"(news)流程**并列**的第二种发布形态。对标微信公众号的"图片消息":5-10 张图的**卡片墙** + 一段 100-300 字的**短描述**,适合拆卡式讲解 / 金句观点串 / 图片清单等"文字偏少、靠图主导"的内容。
 
-- 单一主题的"拆卡"式讲解(示例:[Claude Code /rewind](https://mp.weixin.qq.com/s/erEF74HRGkrBPxTGsKDsSQ))
-- 金句 / 观点串
-- 图片清单 / 作品合集
-- 任何"文字偏少、靠图主导"的内容
+- 默认风格:高密度手绘水彩信息图,账号 `newspic_image_style` → 兜底 `infographic-warm`,**不需要在 brief.md 里写 `image_style`**
+- 4 步流程:`brief.md → newspic_build.py 拆卡 → scripts/generate_image.py 批量生图 → publish.py --type newspic`
+- 短文本必须过精简版 AI 味 gate(phrases + vocab + punctuation,`ai_score.py --mode newspic`)
+- 限制:最多 20 张图(建议 5-10);不支持多平台同步和行内标色;每张图占永久素材名额
 
-### 贴图默认就是高密度手绘信息图
-
-**不需要在 brief.md 里写 `image_style`**,贴图模式的默认兜底是 `infographic-warm`。默认要求是:
-
-- **高密度中文信息图**,不是普通插画、不是大字海报
-- **手绘水彩 + 墨线**,不是 flat vector、不是 3D
-- 9:16 竖版,每张卡都要承载足够信息
-- 配色、布局、设计组件和画面元素按主题自适应,不要固定成同一套版式
-- 机器人、小男孩、终端条、2×2 网格、胶囊标签等都是可选元素,只在内容合适时使用
-
-想换整体氛围就在 brief.md 写 `image_style: infographic-blue` / `infographic-dark` / `infographic-mint`(见 [`assets/image-styles/README.md`](assets/image-styles/README.md))。即使用这些风格,也只是给一个视觉方向,不是强制固定布局。
-
-**账号级别**:`wechat-publisher.yaml` 里每个账号可以配 `newspic_image_style`,与文章模式的 `image_style` 分开(因为文章线条手绘和贴图水彩信息图是两种完全不同的视觉语言)。当前默认:
-- main 账号 → `newspic_image_style: infographic-warm`(参考图同款)
-- tech 账号 → `newspic_image_style: infographic-blue`(冷蓝变体)
-
-### 何时用贴图,何时用图文
-
-| 判据 | 图文(news) | 贴图(newspic) |
-|---|---|---|
-| 正文字数 | 2500-5000 字 | 100-300 字短描述 |
-| 图数 | 6-10 张内联 | 5-10 张卡片墙 |
-| 主载体 | 文字 | 图片 |
-| 结构 | 开篇/小节/结尾 | 拆卡,一卡一要点 |
-| 适合 | 深度观察 / 教程长文 | 观点串 / 技巧卡 / 金句 |
-| AI 味 gate | 完整 5 维 | 精简(phrases + vocab + punctuation) |
-
-### 4 步流程
-
-```
-brief.md → newspic_build.py 拆卡 → `scripts/generate_image.py` 批量生图 → publish.py --type newspic
-```
-
-#### 1. 写 brief.md
-
-```markdown
----
-topic: "Claude Code /rewind 命令"
-image_style: infographic-warm  # 可选,不写用账号 newspic_image_style,再兜底 infographic-warm
-card_count: 6                  # 可选,不写按要点数
-title: "Claude Code 里,最有用的命令之一"
-account: main
----
-
-# 要点
-
-1. /rewind 厉害的地方不是"撤销一下",而是给你一个更对的工作流
-2. 你可以输入 /rewind,也可以连续按两次 Esc,快速回滚代码
-3. AI 解决不好问题,常常不是因为它不够会写,而是你不敢让它放手试
-4. /rewind 的价值,就是把"试错"这件事真正变得可控
-
-# 短文本
-
-/rewind 厉害的地方,不是"撤销一下",而是给你一个更对的工作流:
-先大胆尝试,再快速回退。
-真正值得的不是它的撤销力,而是它给你的"敢试"。
-```
-
-**frontmatter 字段**:
-- `topic`(必填):整个贴图的核心主题,用于给 Claude 提供语境
-- `image_style`(可选):配图风格。不填就走 **账号 `newspic_image_style` → 全局 `infographic-warm`** 兜底。贴图模式默认就是高密度手绘水彩信息图,正常情况下这行留空。
-- `card_count`(可选):卡片数量,不填按要点数,必须 ≤ 要点数,≤ 20
-- `title`(可选):贴图标题,不填也行
-- `account`(可选):发到哪个账号
-
-**正文**至少要有 `# 要点` 小节,每行一条要点;`# 短文本` 可选(不填就让 Claude 根据要点写)。
-
-#### 2. 拆卡 + 生成计划
-
-```bash
-python3 scripts/newspic_build.py brief.md
-# → 同目录写出 card_plan.json,列出每张卡的主副文字 + 完整 Gemini prompt + 目标文件名
-```
-
-Claude 读 `card_plan.json`,按每张卡的 `prompt` 字段调项目内置 `scripts/generate_image.py` 生图,保存到 `brief.md` 同目录的 `images/01.png`、`02.png` ...
-
-#### 3. 写 / 检验短文本
-
-如果 `brief.md` 的 `# 短文本` 还是空的,Claude 根据要点写一段 100-300 字,填回去。
-
-**短文本必须通过 AI 味 gate**(newspic 模式权重:phrases 55% + vocab 35% + punctuation 10%,跳过 burstiness / structural):
-
-```bash
-# publish.py 会自动在发送前跑一次,这里是手动预检
-python3 scripts/ai_score.py brief.md --mode newspic --threshold 45
-```
-
-命中 AI 套话或高频词 → 回去改短文本,重跑直到通过。
-
-#### 4. 发布
-
-```bash
-python3 scripts/publish.py --account main --type newspic --brief brief.md
-# 或显式覆盖风格
-python3 scripts/publish.py --account main --type newspic --brief brief.md --image-style knowledge-card
-```
-
-`publish.py` 做的事:
-1. 从 brief.md 读 frontmatter + 短文本
-2. 跑 AI 味 gate(newspic 模式),不过就停
-3. 扫 `brief.md 同目录/images/*.{png,jpg,jpeg,webp}`,按文件名排序作为展示顺序
-4. 逐张上传为微信永久素材(每张占一个永久素材名额,5000 上限)
-5. 调 `draft/add` 建 newspic 草稿
-
-⚠️ **永久素材成本提醒**:贴图每张都走 `add_material`,5-10 张贴图每次发布占 5-10 个永久素材名额。文章模式的正文图走 `uploadimg` 不占名额,但**封面图**和**贴图图片**都要占。
-
-### newspic 的限制
-
-- 微信最多 20 张图,建议 5-10 张,低于 2 张会警告
-- 不支持多平台同步(`--sync` / `--sync-from-config`)
-- 不支持行内标色、HTML 主题 —— 短文本只是一段纯文本
-- 建议用 `marker-*` 极简大字卡,避免过重装饰 + 长句,**卡面字数超过 20 字会影响阅读**
+brief.md 字段说明、何时用贴图 vs 图文的判据表、完整 4 步流程与限制,详见 [references/newspic-mode.md](references/newspic-mode.md)。
 
 ---
 

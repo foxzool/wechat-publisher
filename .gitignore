@@ -29,6 +29,8 @@ article.html
 article_preview.html
 generated/*
 !generated/README.md
+# 运行产物备份(文章/贴图归档目录,同 generated/* 哲学,不入库)
+mp-articles/
 
 # IDE / Harness state
 .vscode/
