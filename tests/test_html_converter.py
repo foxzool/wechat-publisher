@@ -261,11 +261,24 @@ def test_ul_uses_list_style_bullet_token(theme):
     assert "项 A" in html and "项 B" in html
 
 
-def test_all_16_themes_load_without_error():
-    """所有 16 套主题都应能成功加载,且包含必需字段。"""
+def test_all_themes_load_without_error():
+    """所有内置主题都应能成功加载,且包含必需字段。
+
+    注:此断言历史上写死 16,但仓库首个提交只带了 15 套主题(从无第 16 套),
+    是过期的魔法数字。改为对齐实际内置主题集合——既反映现实,又能抓到
+    主题被误删/误加/改名(比裸计数更有意义)。
+    """
     from html_converter import list_themes
     names = list_themes()
-    assert len(names) == 16, f"应有 16 套主题,实际 {len(names)}: {names}"
+    expected = {
+        "academic-paper", "business-navy", "elegant-ink", "girly-pink",
+        "ink-wash", "magazine-grid", "minimal-bw", "minimal-mono",
+        "mint-fresh", "news-bold", "refined-blue", "sage-premium",
+        "sunset-coral", "warm-editorial", "warm-orange",
+    }
+    assert set(names) == expected, (
+        f"内置主题集合变化: 多出 {set(names) - expected}, 缺少 {expected - set(names)}"
+    )
     for name in names:
         styles, highlights, divider, list_style = load_theme(theme_name=name)
         # 每套主题至少要有 body / h2 / p / strong 这几个基础键
