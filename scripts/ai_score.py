@@ -37,6 +37,25 @@ from pathlib import Path
 DEFAULT_THRESHOLD: float = 45.0
 
 
+# ---------- 共享词表(单一真源) ----------
+# AI 高频词的真源在仓库根 humanizer/lexicon.json,由 humanizer/sync.mjs 生成 vendored
+# 副本 _humanizer_lexicon.json 到本目录。读不到副本时(如 skill 独立安装、无仓库根)
+# 回退到下方内置兜底列表,保证仍可用。
+_LEXICON_PATH = Path(__file__).with_name("_humanizer_lexicon.json")
+
+
+def _lexicon_category(name: str, fallback: list) -> list:
+    """从 vendored 词表读某个分类;读不到或为空则用兜底。"""
+    try:
+        data = json.loads(_LEXICON_PATH.read_text(encoding="utf-8"))
+        terms = data.get("categories", {}).get(name)
+        if isinstance(terms, list) and terms:
+            return terms
+    except (OSError, ValueError):
+        pass
+    return fallback
+
+
 # ---------- 黑名单 ----------
 
 # AI 高频套话句式(正则)
@@ -75,8 +94,9 @@ AI_PHRASES = [
     r"产生了(深远|重大|巨大)的影响",
 ]
 
-# AI 高频名词 / 形容词(整篇密集出现即扣分)
-AI_VOCAB = [
+# AI 高频名词 / 形容词(整篇密集出现即扣分)。
+# 真源见 humanizer/lexicon.json 的 zh-commercial 分类;下方是独立安装时的兜底。
+_AI_VOCAB_FALLBACK = [
     "赋能", "打造", "聚焦", "深度融合", "生态", "闭环", "链路", "抓手",
     "价值链", "护城河", "方法论", "底层逻辑", "生态位", "结构化思维",
     "提升效率", "助力", "全链路", "一站式", "端到端", "量变到质变",
@@ -84,6 +104,7 @@ AI_VOCAB = [
     "降本增效", "数字化转型", "智能化", "生态体系", "产业升级",
     "破局", "出圈", "破圈", "沉淀", "赋予", "深耕", "蓝图", "新篇章",
 ]
+AI_VOCAB = _lexicon_category("zh-commercial", _AI_VOCAB_FALLBACK)
 
 
 def _strip_markdown(md_text: str) -> str:
@@ -241,27 +262,72 @@ def score_punctuation_flatness(text: str) -> tuple:
     }
 
 
+_EMOJI_RE = re.compile(
+    r"[\U0001F000-\U0001FAFF\U00002600-\U000027BF\U00002190-\U000021FF\U00002B00-\U00002BFF]"
+)
+
+
+def score_style(md_text: str) -> tuple:
+    """富文本 Style 层 AI 味(humanizer-zh P14/P15/P17)。
+
+    在**原始 markdown**(strip 之前)上算,补 _strip_markdown 丢弃的维度:
+      - P14 行内加粗滥用   **词** 通篇高亮
+      - P15 列表内联标题   项目符号后紧跟加粗(**术语:** 解释)
+      - P17 emoji 装饰     emoji 当分隔/小标题
+    公众号是富文本重灾区,这些恰恰高度相关,不能像正文那样被剥掉。
+    保守打分:需要真的"滥用"才高分,正常一两处加粗不误伤。
+    """
+    lines = [ln for ln in md_text.split("\n") if ln.strip()]
+    n_lines = max(1, len(lines))
+
+    bold = len(re.findall(r"\*\*[^*\n]+\*\*", md_text))
+    # 列表项紧跟加粗 = 内联标题模板(不论冒号在加粗内还是外)
+    inline_headers = len(re.findall(r"(?m)^\s*(?:[-*+]|\d+\.)\s+\*\*", md_text))
+    emoji_bullets = sum(1 for ln in lines if _EMOJI_RE.match(ln.strip()))
+    emoji_total = len(_EMOJI_RE.findall(md_text))
+
+    bold_density = bold / n_lines
+    ai = 0.0
+    ai += min(40.0, bold_density * 80)      # 行内加粗滥用
+    ai += min(30.0, inline_headers * 15)    # 内联标题模板
+    ai += min(20.0, emoji_bullets * 10)     # emoji 当分隔/小标题
+    ai += min(10.0, emoji_total * 3)        # emoji 总量
+    ai = min(100.0, ai)
+    return round(ai, 1), {
+        "bold": bold,
+        "inline_headers": inline_headers,
+        "emoji_bullets": emoji_bullets,
+        "emoji_total": emoji_total,
+        "content_lines": n_lines,
+    }
+
+
 # ---------- 总评 ----------
 
-# 长文(news)用的完整 5 维权重
+# 长文(news)用的完整 6 维权重
+# style 从 burstiness(30→25)与 structural(10→5)各匀出 5%;punctuation 保持 10%
+# (破折号/标点多样性正分按 DR-1 保留,不动)。
 WEIGHTS_NEWS = {
-    "burstiness": 0.30,
+    "burstiness": 0.25,
     "phrases": 0.30,
     "vocab": 0.20,
-    "structural": 0.10,
+    "structural": 0.05,
     "punctuation": 0.10,
+    "style": 0.10,
 }
 
 # 短文(newspic 贴图)用的精简权重
 # - 短文本里 burstiness 和 structural 都不稳定(句子/枚举少),权重归 0
 # - phrases 和 vocab 是 AI 味主要来源
 # - punctuation 保留兜底(整篇只有句号也是 AI 信号)
+# - style 保留:贴图常用 emoji 装饰,是真实 AI 味信号
 WEIGHTS_NEWSPIC = {
     "burstiness": 0.0,
-    "phrases": 0.55,
+    "phrases": 0.45,
     "vocab": 0.35,
     "structural": 0.0,
     "punctuation": 0.10,
+    "style": 0.10,
 }
 
 # 向后兼容:现有代码从本模块 `from ai_score import WEIGHTS` 的地方仍然能读到长文权重
@@ -290,6 +356,8 @@ def analyze(md_text: str, mode: str = "news") -> dict:
     v_score, v_det = score_vocab(plain)
     s_score, s_det = score_structural_perfection(plain)
     pu_score, pu_det = score_punctuation_flatness(plain)
+    # Style 在原始 markdown 上算(strip 之前),否则加粗/emoji/标题已被剥掉。
+    st_score, st_det = score_style(md_text)
 
     weights = _weights_for(mode)
     total = (
@@ -298,6 +366,7 @@ def analyze(md_text: str, mode: str = "news") -> dict:
         + v_score * weights["vocab"]
         + s_score * weights["structural"]
         + pu_score * weights["punctuation"]
+        + st_score * weights["style"]
     )
 
     verdict = (
@@ -318,6 +387,7 @@ def analyze(md_text: str, mode: str = "news") -> dict:
             "vocab":        {"score": v_score,  "detail": v_det},
             "structural":   {"score": s_score,  "detail": s_det},
             "punctuation":  {"score": pu_score, "detail": pu_det},
+            "style":        {"score": st_score, "detail": st_det},
         },
         "weights": weights,
     }
@@ -362,6 +432,7 @@ def check_ai_score(
             "vocab":       dims["vocab"]["score"],
             "structural":  dims["structural"]["score"],
             "punctuation": dims["punctuation"]["score"],
+            "style":       dims["style"]["score"],
         },
         "hit_phrases": hit_phrases,
         "hit_vocab":   hit_vocab,
@@ -401,6 +472,11 @@ def _pretty_print(report: dict):
             print(f"      人味标点 {det.get('flavor_points', 0)} 次,期望 {det.get('expected', 0)}")
         elif name == "structural" and det.get("hit_count"):
             print(f"      教科书枚举命中 {det['hit_count']} 次")
+        elif name == "style" and (det.get("bold") or det.get("emoji_total") or det.get("inline_headers")):
+            print(
+                f"      加粗×{det.get('bold', 0)} 内联标题×{det.get('inline_headers', 0)} "
+                f"emoji×{det.get('emoji_total', 0)}(行首 {det.get('emoji_bullets', 0)})"
+            )
     print("=" * 60)
 
 

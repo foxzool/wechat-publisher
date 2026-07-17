@@ -182,6 +182,41 @@ def test_phrase_overlap_deduped():
     )
 
 
+def test_style_dimension_flags_markdown_slop():
+    """Rich-text AI slop (heavy inline bold + emoji bullets + inline-header
+    lists) must score high on the new `style` dimension; clean prose must not.
+
+    Regression for the _strip_markdown blind spot: bold/emoji/headers were
+    stripped BEFORE scoring, so humanizer-zh Style patterns (P14/P15/P17) were
+    invisible. They are now scored on the RAW markdown.
+    """
+    slop_md = (
+        "## 🚀 核心要点\n\n"
+        "- **敏捷开发:** 一种迭代式的方法。\n"
+        "- **持续集成:** 自动化的构建流程。\n"
+        "- **微服务架构:** 解耦的系统设计。\n\n"
+        "✅ **下一步:** 立即行动。\n"
+        "🔥 **重点提示:** 不要错过。\n"
+    )
+    clean_md = (
+        "上周三下午我在调一个老脚本,屏幕上突然蹦出一个 404。\n"
+        "我盯着日志看了三分钟,才发现是超时参数被我从 30 秒改成了 5 秒。\n"
+        "改回去,服务就活了。没有任何报警。这事儿挺离谱的。\n"
+    )
+    slop_style, _ = ai_score.score_style(slop_md)
+    clean_style, _ = ai_score.score_style(clean_md)
+    assert slop_style > clean_style
+    assert slop_style >= 50, f"heavy markdown decoration scored only {slop_style}"
+    assert clean_style < 20, f"clean prose false-positived at {clean_style}"
+
+
+def test_style_dimension_in_report():
+    """check_ai_score must surface the new style dimension."""
+    _, report = ai_score.check_ai_score(HUMAN_SAMPLE, threshold=50.0)
+    assert "style" in report["dimensions"]
+    assert isinstance(report["dimensions"]["style"], (int, float))
+
+
 def test_threshold_parameter_respected():
     """Edge case: same content, two different thresholds should flip pass/fail."""
     # Pick a text in the grey zone so threshold actually matters.
