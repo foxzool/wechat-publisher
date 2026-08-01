@@ -218,6 +218,16 @@
         "zh-commercial",
         "zh-set-phrase"
       ]
+    },
+    "humanizer-chinese": {
+      "_engine": "none — prose-only skill (separate repo ~/codes/humanizer-chinese, github.com/jiji262/humanizer-chinese). NOT a sync target: no runtime engine reads a vendored copy; its SKILL.md curates SUBSETS of these categories as 盯防词 by hand. When editing the categories below, check whether SKILL.md's word lists should follow.",
+      "uses": [
+        "zh-commercial",
+        "zh-set-phrase",
+        "zh-reader-shout",
+        "zh-no-stance",
+        "zh-bait"
+      ]
     }
   }
 }
