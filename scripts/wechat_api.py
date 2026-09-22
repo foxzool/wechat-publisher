@@ -100,7 +100,11 @@ if __name__ == "__main__":
 
         elif args.command == "token":
             token = get_access_token()
-            print(f"access_token: {token}")
+            if str(token).startswith("zproxy:"):
+                print(f"token path: {token} (WeChat access_token stays on zproxy/ECS; smoke OK)")
+            else:
+                # never print full token to logs — only length + prefix
+                print(f"access_token: ok len={len(token)} prefix={token[:4]}…")
 
         elif args.command == "upload-thumb":
             media_id = upload_thumb_image(args.image)

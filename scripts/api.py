@@ -76,27 +76,35 @@ def upload_thumb_image(image_path: Union[str, Path]) -> str:
     ⚠️ 占用公众号永久素材配额(图片上限 5000 个)。
     返回的 media_id 用于创建草稿时的 thumb_media_id。
     """
-    token = get_access_token()
-    url = f"{API_BASE}/material/add_material?access_token={token}&type=image"
-
     image_path = Path(image_path)
     if not image_path.exists():
         raise FileNotFoundError(f"图片文件不存在: {image_path}")
 
-    mime_type = _guess_mime(image_path)
+    try:
+        from zproxy_client import zproxy_enabled, upload_material_via_zproxy
+    except ImportError:
+        zproxy_enabled = lambda: False  # type: ignore
 
+    if zproxy_enabled():
+        data = upload_material_via_zproxy(image_path, "thumb")
+        media_id = data.get("media_id")
+        if not media_id:
+            raise RuntimeError(f"zproxy 封面上传未返回 media_id: {data}")
+        print(f"封面图上传成功(via zproxy): media_id={media_id}")
+        return media_id
+
+    token = get_access_token()
+    url = f"{API_BASE}/material/add_material?access_token={token}&type=image"
+    mime_type = _guess_mime(image_path)
     with open(image_path, "rb") as f:
         files = {"media": (image_path.name, f, mime_type)}
         resp = _api_request_with_retry("POST", url, files=files)
-
     resp.raise_for_status()
     data = resp.json()
-
     if "media_id" not in data:
         error_msg = data.get("errmsg", "未知错误")
         error_code = data.get("errcode", -1)
         raise RuntimeError(f"上传封面图失败 [{error_code}]: {error_msg}")
-
     print(f"封面图上传成功: media_id={data['media_id']}")
     return data["media_id"]
 
@@ -112,6 +120,13 @@ def upload_newspic_image(image_path: Union[str, Path]) -> str:
 
     每个贴图 5-10 张图就要占掉 5-10 个素材名额,发布前心里有数。
     """
+
+    try:
+        from zproxy_client import zproxy_enabled as _zp
+    except ImportError:
+        _zp = lambda: False
+    if _zp():
+        raise RuntimeError("zproxy 模式不支持 newspic(omni-pub 无对应路由);请关 zproxy 或用图文草稿")
     token = get_access_token()
     url = f"{API_BASE}/material/add_material?access_token={token}&type=image"
 
@@ -144,27 +159,37 @@ def upload_content_image(image_path: Union[str, Path]) -> str:
     返回 https:// 格式的 CDN URL(微信有时返回 http,这里统一改 https
     以避免草稿 HTML 里的混合内容阻拦)。
     """
-    token = get_access_token()
-    url = f"{API_BASE}/media/uploadimg?access_token={token}"
-
     image_path = Path(image_path)
     if not image_path.exists():
         raise FileNotFoundError(f"图片文件不存在: {image_path}")
 
-    mime_type = _guess_mime(image_path)
+    try:
+        from zproxy_client import zproxy_enabled, upload_material_via_zproxy
+    except ImportError:
+        zproxy_enabled = lambda: False  # type: ignore
 
+    if zproxy_enabled():
+        data = upload_material_via_zproxy(image_path, "content_image")
+        img_url = data.get("url") or ""
+        if img_url.startswith("http://"):
+            img_url = "https://" + img_url[len("http://"):]
+        if not img_url:
+            raise RuntimeError(f"zproxy 正文图上传未返回 url: {data}")
+        print(f"正文图片上传成功(via zproxy): {img_url}")
+        return img_url
+
+    token = get_access_token()
+    url = f"{API_BASE}/media/uploadimg?access_token={token}"
+    mime_type = _guess_mime(image_path)
     with open(image_path, "rb") as f:
         files = {"media": (image_path.name, f, mime_type)}
         resp = _api_request_with_retry("POST", url, files=files)
-
     resp.raise_for_status()
     data = resp.json()
-
     if "url" not in data:
         error_msg = data.get("errmsg", "未知错误")
         error_code = data.get("errcode", -1)
         raise RuntimeError(f"上传正文图片失败 [{error_code}]: {error_msg}")
-
     img_url = data["url"]
     if img_url.startswith("http://"):
         img_url = "https://" + img_url[len("http://"):]
@@ -256,14 +281,35 @@ def add_draft(articles: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
     Returns:
         str: 草稿 media_id
     """
-    token = get_access_token()
-    url = f"{API_BASE}/draft/add?access_token={token}"
-
     if isinstance(articles, dict):
         articles = [articles]
 
-    payload = {"articles": articles}
+    try:
+        from zproxy_client import zproxy_enabled, create_draft_via_zproxy
+    except ImportError:
+        zproxy_enabled = lambda: False  # type: ignore
 
+    if zproxy_enabled():
+        if len(articles) != 1:
+            raise RuntimeError("zproxy 模式暂只支持单篇草稿(与 omni-pub /v1/drafts 对齐)")
+        art = articles[0]
+        data = create_draft_via_zproxy(
+            title=art["title"],
+            content=art["content"],
+            thumb_media_id=art["thumb_media_id"],
+            author=art.get("author") or "",
+            digest=art.get("digest") or "",
+            content_source_url=art.get("content_source_url") or "",
+        )
+        media_id = data.get("media_id")
+        if not media_id:
+            raise RuntimeError(f"zproxy 草稿未返回 media_id: {data}")
+        print(f"草稿创建成功(via zproxy)! media_id={media_id}")
+        return media_id
+
+    token = get_access_token()
+    url = f"{API_BASE}/draft/add?access_token={token}"
+    payload = {"articles": articles}
     resp = _api_request_with_retry(
         "POST", url,
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
@@ -271,12 +317,10 @@ def add_draft(articles: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
     )
     resp.raise_for_status()
     data = resp.json()
-
     if "media_id" not in data:
         error_msg = data.get("errmsg", "未知错误")
         error_code = data.get("errcode", -1)
         raise RuntimeError(f"新建草稿失败 [{error_code}]: {error_msg}")
-
     print(f"草稿创建成功! media_id={data['media_id']}")
     return data["media_id"]
 

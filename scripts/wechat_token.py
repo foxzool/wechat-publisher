@@ -120,6 +120,32 @@ def _fetch_token_with_retry(app_id: str, app_secret: str, account_key: str, retr
 
 def get_access_token(force_refresh: bool = False, account_name: Optional[str] = None) -> str:
     """
+    获取 access_token。
+
+    若 wechat-publisher.yaml 启用 zproxy: 不直连微信(避免云机 40164),
+    改为经 zproxy 做一次 materials smoke 验证连通性,并返回占位串
+    `zproxy:<account>` —— 真实 token 只存在于 ECS。调用方应走 api.py 的
+    zproxy 分支,勿把返回值拼进 api.weixin.qq.com。
+    """
+    try:
+        from zproxy_client import zproxy_enabled, verify_token_via_zproxy
+    except ImportError:
+        zproxy_enabled = lambda: False  # type: ignore
+        verify_token_via_zproxy = None  # type: ignore
+
+    if zproxy_enabled():
+        config = get_config(account_name)
+        account_key = config.get("account_key", "default")
+        ok, msg = verify_token_via_zproxy()
+        if not ok:
+            raise RuntimeError(f"zproxy token 验证失败 (账号: {account_key}): {msg}")
+        return f"zproxy:{account_key}"
+
+    return _get_access_token_direct(force_refresh=force_refresh, account_name=account_name)
+
+
+def _get_access_token_direct(force_refresh: bool = False, account_name: Optional[str] = None) -> str:
+    """
     获取 access_token,自动缓存 + 失效前 5 分钟刷新。
 
     Args:
