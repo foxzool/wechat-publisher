@@ -494,7 +494,9 @@ python3 scripts/publish.py \
 1. 从 `wechat-publisher.yaml` 读取对应账号的 `author` 和 `theme`
 2. 按 theme 加载对应主题排版
 3. 处理图片 → HTML 转换 → 封面上传 → 创建草稿
-4. 返回 `media_id`
+4. 返回 `media_id`(zproxy 下另含 `action=updated|created`)
+
+**zproxy 同标题更新**(默认开启):`--update-existing-by-title` / `--no-update-existing-by-title`。开启时 omni-pub 对同标题草稿走 `batchget` + `draft/update`,避免重复新增。
 
 **不需要手动传 `--theme` 或 `--author`** —— 账号配置会自动带入。
 

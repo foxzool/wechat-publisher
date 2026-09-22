@@ -269,14 +269,20 @@ def add_newspic_draft(
     return data["media_id"]
 
 
-def add_draft(articles: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
+def add_draft(
+    articles: Union[Dict[str, Any], List[Dict[str, Any]]],
+    *,
+    update_existing_by_title: Optional[bool] = None,
+) -> str:
     """
-    新建草稿。
+    新建或按标题更新草稿。
 
     Args:
         articles: 单篇(dict)或多篇(list[dict])。每篇字典必选字段:
             - title, content (HTML), thumb_media_id
             可选: author, digest, content_source_url, need_open_comment, only_fans_can_comment
+        update_existing_by_title: zproxy 路径下同名草稿是否走 draft/update。
+            None → zproxy 默认 True(同标题 republish);直连微信 API 时忽略。
 
     Returns:
         str: 草稿 media_id
@@ -293,6 +299,7 @@ def add_draft(articles: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
         if len(articles) != 1:
             raise RuntimeError("zproxy 模式暂只支持单篇草稿(与 omni-pub /v1/drafts 对齐)")
         art = articles[0]
+        flag = True if update_existing_by_title is None else bool(update_existing_by_title)
         data = create_draft_via_zproxy(
             title=art["title"],
             content=art["content"],
@@ -300,11 +307,25 @@ def add_draft(articles: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
             author=art.get("author") or "",
             digest=art.get("digest") or "",
             content_source_url=art.get("content_source_url") or "",
+            update_existing_by_title=flag,
         )
         media_id = data.get("media_id")
         if not media_id:
             raise RuntimeError(f"zproxy 草稿未返回 media_id: {data}")
-        print(f"草稿创建成功(via zproxy)! media_id={media_id}")
+        action = data.get("action") or ("updated" if flag else "created")
+        verb = "更新" if action == "updated" else "创建"
+        print(
+            f"草稿{verb}成功(via zproxy)! media_id={media_id} "
+            f"action={action} update_existing_by_title={flag}"
+        )
+        # stash for publish_article result enrichment
+        add_draft._last_zproxy_meta = {  # type: ignore[attr-defined]
+            "media_id": media_id,
+            "action": action,
+            "update_existing_by_title": flag,
+            "author": art.get("author") or "",
+            "title": art.get("title") or "",
+        }
         return media_id
 
     token = get_access_token()
@@ -337,9 +358,10 @@ def publish_article(
     digest: str = "",
     source_url: str = "",
     account_name: Optional[str] = None,
+    update_existing_by_title: Optional[bool] = None,
 ) -> Dict[str, Any]:
     """
-    一站式发布:上传封面图 → 创建草稿。
+    一站式发布:上传封面图 → 创建/按标题更新草稿。
 
     Args:
         title: 文章标题
@@ -349,9 +371,12 @@ def publish_article(
         digest: 摘要(自动截 120 字)
         source_url: 原文链接
         account_name: 账号名(可选,默认用当前激活账号)
+        update_existing_by_title: zproxy 同名草稿更新;None → zproxy 默认 True
 
     Returns:
-        {"media_id": str, "status": "success", "account": str}
+        {"media_id": str, "status": "success", "account": str,
+         "action": optional "updated"|"created", "author": str,
+         "update_existing_by_title": optional bool}
     """
     if account_name:
         set_account(account_name)
@@ -363,12 +388,13 @@ def publish_article(
     account_display = config.get("account_name", "default")
     print(f"开始发布文章: {title}")
     print(f"目标账号: {account_display}")
+    print(f"作者: {author}")
     print("=" * 50)
 
     print("[1/2] 上传封面图...")
     thumb_media_id = upload_thumb_image(cover_image_path)
 
-    print("[2/2] 创建草稿...")
+    print("[2/2] 创建/更新草稿...")
     article = {
         "title": title,
         "content": html_content,
@@ -379,13 +405,24 @@ def publish_article(
     if source_url:
         article["content_source_url"] = source_url
 
-    media_id = add_draft(article)
+    media_id = add_draft(article, update_existing_by_title=update_existing_by_title)
 
     print("=" * 50)
     print("发布成功! 文章已保存到草稿箱。")
     print("请登录微信公众平台查看和发布。")
 
-    return {"media_id": media_id, "status": "success", "account": account_display}
+    out: Dict[str, Any] = {
+        "media_id": media_id,
+        "status": "success",
+        "account": account_display,
+        "author": author,
+        "title": title,
+    }
+    meta = getattr(add_draft, "_last_zproxy_meta", None)
+    if isinstance(meta, dict) and meta.get("media_id") == media_id:
+        out["action"] = meta.get("action")
+        out["update_existing_by_title"] = meta.get("update_existing_by_title")
+    return out
 
 
 def publish_newspic(

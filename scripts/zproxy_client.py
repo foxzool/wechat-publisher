@@ -118,8 +118,11 @@ def create_draft_via_zproxy(
     author: str = "",
     digest: str = "",
     content_source_url: str = "",
-    update_existing_by_title: bool = False,
+    update_existing_by_title: bool = True,
 ) -> Dict[str, Any]:
+    """POST /v1/drafts. Default update_existing_by_title=True → same-title draft/update via omni-pub.
+    Response includes media_id and action ('updated'|'created').
+    """
     z = get_zproxy_settings()
     if not z:
         raise RuntimeError("zproxy not enabled")

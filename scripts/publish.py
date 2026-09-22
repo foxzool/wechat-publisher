@@ -180,6 +180,7 @@ def publish_from_markdown(
     skip_ai_score: bool = False,
     allow_missing_images: bool = False,
     debug: bool = False,
+    update_existing_by_title: Optional[bool] = None,
 ):
     """
     从Markdown文件发布文章到微信公众号草稿箱。
@@ -209,6 +210,7 @@ def publish_from_markdown(
         skip_ai_score: True 时跳过 AI 味检测(默认 False)
         allow_missing_images: True 时允许部分图片上传失败仍继续发布(默认 False,缺图即中止)
         debug: True 时把生成的 HTML 保存到 temp_dir 下方便调试
+        update_existing_by_title: zproxy 同名草稿更新;None → zproxy 默认 True
 
     Returns:
         dict: 发布结果
@@ -362,11 +364,15 @@ def publish_from_markdown(
         author=author,
         digest=digest,
         source_url=source_url,
+        update_existing_by_title=update_existing_by_title,
     )
 
     print("\n" + "=" * 60)
     print("发布完成！")
     print(f"  草稿 media_id: {result['media_id']}")
+    if result.get("action"):
+        print(f"  草稿 action: {result['action']} (update_existing_by_title={result.get('update_existing_by_title')})")
+    print(f"  作者: {result.get('author') or author}")
     print("  请登录微信公众平台查看草稿箱")
     print("=" * 60)
 
@@ -570,6 +576,7 @@ def publish_from_html(
     digest="",
     source_url="",
     account_name: Optional[str] = None,
+    update_existing_by_title: Optional[bool] = None,
 ):
     """
     从已排版的HTML文件发布文章。
@@ -610,6 +617,7 @@ def publish_from_html(
         author=author,
         digest=digest,
         source_url=source_url,
+        update_existing_by_title=update_existing_by_title,
     )
     return result
 
@@ -698,6 +706,19 @@ def _build_parser() -> argparse.ArgumentParser:
         "--debug",
         action="store_true",
         help="调试模式:把生成的 HTML 保存到 temp_dir 方便排查",
+    )
+    parser.add_argument(
+        "--update-existing-by-title",
+        dest="update_existing_by_title",
+        action="store_true",
+        default=True,
+        help="zproxy 下同标题草稿走 draft/update(默认开启,避免重复新增)",
+    )
+    parser.add_argument(
+        "--no-update-existing-by-title",
+        dest="update_existing_by_title",
+        action="store_false",
+        help="关闭同标题更新,始终新建草稿",
     )
     return parser
 
@@ -792,6 +813,7 @@ def main():
             author=args.author,
             digest=args.digest or "",
             source_url=args.source_url,
+            update_existing_by_title=args.update_existing_by_title,
         )
     elif args.input:
         result = publish_from_markdown(
@@ -809,6 +831,7 @@ def main():
             skip_ai_score=args.skip_ai_score,
             allow_missing_images=args.allow_missing_images,
             debug=args.debug,
+            update_existing_by_title=args.update_existing_by_title,
         )
     else:
         parser.error("请提供 --input (Markdown) / --html / --brief(贴图)参数")

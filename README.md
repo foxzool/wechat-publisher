@@ -120,7 +120,7 @@ python3 scripts/html_converter.py article.md --theme refined-blue -o article.htm
 python3 scripts/ai_score.py article.md --threshold 45
 ```
 
-`publish.py` 会从 `wechat-publisher.yaml` 读 author / theme,依次做图片处理 → HTML 转换 → AI 味 gate(默认阈值 45)→ 封面上传 → 创建草稿。每个脚本 `--help` 查看完整参数。
+`publish.py` 会从 `wechat-publisher.yaml` 读 author / theme,依次做图片处理 → HTML 转换 → AI 味 gate(默认阈值 45)→ 封面上传 → 创建草稿。启用 **zproxy** 时默认 `--update-existing-by-title`(同标题 republish 走 draft/update,可用 `--no-update-existing-by-title` 关闭)。每个脚本 `--help` 查看完整参数。
 
 ## 排版主题
 
