@@ -2,11 +2,12 @@
 """
 统一生图入口。
 
-默认走项目内置 baoyu_image_gen.ts。需要回退到 Gemini Web 登录版时,
-可在 wechat-publisher.yaml 配置:
+默认走项目内置 baoyu_image_gen.ts。可选后端:
 
     image_generation:
-      generator: baoyu-danger-gemini-web
+      generator: baoyu-image-gen            # 默认
+      # generator: baoyu-danger-gemini-web  # Gemini Web 登录版
+      # generator: grok-build               # 云机 grok + Imagine (需 PATH 上有 grok)
 
 """
 
@@ -23,7 +24,7 @@ from config import ConfigError, get_config, get_global_image_generator, load_env
 
 
 DEFAULT_GENERATOR = "baoyu-image-gen"
-GENERATORS = {"baoyu-image-gen", "baoyu-danger-gemini-web"}
+GENERATORS = {"baoyu-image-gen", "baoyu-danger-gemini-web", "grok-build"}
 
 
 def _script_dir() -> Path:
@@ -95,6 +96,35 @@ def _danger_gemini_web_args(args: argparse.Namespace) -> List[str]:
     return _base_args(args)
 
 
+
+def _grok_build_args(args: argparse.Namespace) -> List[str]:
+    """Args for scripts/grok_image_gen.py."""
+    if not args.prompt and not args.promptfiles:
+        raise SystemExit("grok-build 需要 --prompt 或 --promptfiles")
+    prompt = args.prompt or ""
+    if args.promptfiles:
+        parts = [Path(fp).read_text(encoding="utf-8") for fp in args.promptfiles]
+        joined = "\n\n".join(parts).strip()
+        prompt = f"{prompt}\n\n{joined}".strip() if prompt else joined
+    cmd: List[str] = ["--prompt", prompt, "--image", args.image]
+    if args.ar:
+        cmd += ["--ar", args.ar]
+    if args.size:
+        cmd += ["--size", args.size]
+    if args.quality:
+        cmd += ["--quality", args.quality]
+    unsupported = []
+    for name in ("provider", "model", "n", "ref"):
+        if getattr(args, name, None):
+            unsupported.append(f"--{name}")
+    if unsupported:
+        print(
+            "警告: grok-build 忽略这些参数: " + ", ".join(unsupported),
+            file=sys.stderr,
+        )
+    return cmd
+
+
 def build_command(args: argparse.Namespace) -> tuple[str, List[str]]:
     load_env()
     generator = _resolve_generator(args.account, args.generator)
@@ -105,6 +135,13 @@ def build_command(args: argparse.Namespace) -> tuple[str, List[str]]:
             "bun",
             str(scripts / "baoyu_danger_gemini_web" / "main.ts"),
             *_danger_gemini_web_args(args),
+        ]
+
+    if generator == "grok-build":
+        return generator, [
+            sys.executable,
+            str(scripts / "grok_image_gen.py"),
+            *_grok_build_args(args),
         ]
 
     return generator, [

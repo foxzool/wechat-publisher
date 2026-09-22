@@ -30,8 +30,11 @@ accounts:
       技术团队，持续输出工程实践。
 
 image_generation:
-  # 默认 baoyu-image-gen; 如需使用 Web 登录版 Gemini,改为 baoyu-danger-gemini-web
+  # 默认 baoyu-image-gen
+  # 可选: baoyu-danger-gemini-web (Web 登录版 Gemini)
+  # 可选: grok-build (云机 grok CLI + Imagine; 需 PATH 上有 grok 且已 OAuth ~/.grok/auth.json)
   generator: "baoyu-image-gen"
+  # generator: "grok-build"
 
   # baoyu-image-gen / provider=openai
   openai:
@@ -51,6 +54,14 @@ image_generation:
     # cookie_path: "/Users/you/Library/Application Support/baoyu-skills/gemini-web/cookies.json"
     # chrome_profile_dir: "/Users/you/Library/Application Support/baoyu-skills/gemini-web/chrome-profile"
     # chrome_path: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+
+# 可选: 经 omni-pub zproxy 固定出口 IP 调微信 API(云机直连常 40164)
+# zproxy:
+#   enabled: true
+#   server: "https://your-zproxy.example.com"
+#   api_key: "your_zproxy_api_key"
+#   wechat_app_id_header: "MAIN"   # 与 zproxy 账号映射头一致
 
 integrations:
   # 多平台同步: @wechatsync/cli + Chrome 扩展 MCP token

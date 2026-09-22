@@ -15,6 +15,8 @@ description: |
 
 # 微信公众号文章自动创作与发布
 
+> **Fork**: [foxzool/wechat-publisher](https://github.com/foxzool/wechat-publisher) (upstream [jiji262/wechat-publisher](https://github.com/jiji262/wechat-publisher)). 本 fork 含 **zproxy** 与 **grok-build**。
+
 本 skill 实现从素材输入到公众号草稿箱的完整自动化流程。核心价值:用户只需提供一个话题或几篇参考资料,skill 自动完成搜索调研、撰写、生成配图、排版、AI 味自检、发布。
 
 > **⚠️ 不要使用 `baoyu-post-to-wechat` skill。** 本 skill 是自研的完整发布管线,和 `baoyu-post-to-wechat` 功能有重合但行为不同(本 skill 带多账号 / 主题排版 / 反 AI 检测 gate)。如果 Claude 路由时同时看到两者,**明确选本 skill(`wechat-publisher`)**,不要调用 `baoyu-post-to-wechat`。
@@ -92,6 +94,17 @@ image_generation:
   generator: "baoyu-danger-gemini-web"
 ```
 
+或启用 grok-build(云机 Imagine):
+
+```yaml
+image_generation:
+  generator: "grok-build"
+```
+
+```bash
+python3 scripts/generate_image.py --generator grok-build -p "tiny red circle" --image /tmp/out.jpg --ar 1:1
+```
+
 ```bash
 python3 scripts/generate_image.py --account main --prompt "A hand-drawn AI infographic" --image ./images/01.png
 ```
@@ -99,6 +112,7 @@ python3 scripts/generate_image.py --account main --prompt "A hand-drawn AI infog
 可选值:
 - `baoyu-image-gen`:默认,支持 OpenAI Images 与 Gemini CLI / chat 代理,不依赖外部 baoyu skill
 - `baoyu-danger-gemini-web`:Web 登录版 Gemini,使用本 skill 内置拷贝 `scripts/baoyu_danger_gemini_web/`,需要本机 Google/Gemini Web 登录 cookie
+- `grok-build`:云机 Grok Build CLI + Imagine(`image_gen`);需 `grok` 在 PATH 且 `~/.grok/auth.json` 已 OAuth。实现见 `scripts/grok_image_gen.py`
 
 **第一步:确认账号配置**
 
@@ -575,7 +589,7 @@ mp-articles/<main|tech>/<YYYY-MM-DD>-<slug>/
 | 脚本 | 用途 |
 |---|---|
 | `publish.py` | 完整发布流程(一键,含 AI 味 gate)。支持 `--type news\|newspic` 双模式 |
-| `generate_image.py` | **统一生图入口** —— 根据 `wechat-publisher.yaml` 选择 `baoyu-image-gen` 或 `baoyu-danger-gemini-web` |
+| `generate_image.py` | **统一生图入口** —— 根据 `wechat-publisher.yaml` 选择 `baoyu-image-gen` / `baoyu-danger-gemini-web` / `grok-build` |
 | `newspic_build.py` | **贴图拆卡器** —— brief.md → card_plan.json(Claude 再按 prompt 生图) |
 | `wechat_api.py` | **facade** —— 重导出下述模块 + 提供 CLI |
 | `config.py` | (内部)`wechat-publisher.yaml` + 配图风格加载 + `set_account` / `get_config` / `resolve_image_style` |

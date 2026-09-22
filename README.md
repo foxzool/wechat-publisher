@@ -1,12 +1,14 @@
 # wechat-publisher
 
+> **Fork**: [foxzool/wechat-publisher](https://github.com/foxzool/wechat-publisher) (upstream [jiji262/wechat-publisher](https://github.com/jiji262/wechat-publisher)). 本 fork 增加 **zproxy** 固定出口 IP 与 **grok-build** 生图后端。
+
 微信公众号文章自动创作与发布工具:从选题搜索、撰写、AI 配图、排版到发布草稿箱,一条命令搞定。可作为 [Claude Code](https://claude.ai/code) / Codex / Cursor 的 Skill,也可独立命令行调用。
 
 ## 功能
 
 - **全网素材搜索**:围绕话题多轮搜索、交叉验证,筛选最新案例与权威观点
 - **AI 写作**:3000–5000 字深度长文,多种结构按题材选择,内置反 AI 味规则
-- **AI 配图**:`scripts/generate_image.py` 为每章生成风格统一的手绘信息图,支持 OpenAI / Gemini 后端
+- **AI 配图**:`scripts/generate_image.py` 为每章生成风格统一的手绘信息图,支持 OpenAI / Gemini / **grok-build**(云机 Imagine) 后端
 - **微信排版**:Markdown → 微信兼容 HTML,样式全内联,内置 **15 套主题**,粘贴不丢样式
 - **一键发布**:封面、标题、摘要、作者自动填好,直达草稿箱
 - **反 AI 检测 gate**:`ai_score.py` 5 维打分,发布前自动拦截高 AI 味稿件
@@ -16,13 +18,13 @@
 作为 Skill 安装(通过 [skills.sh](https://skills.sh)):
 
 ```bash
-npx skills add jiji262/wechat-publisher
+npx skills add foxzool/wechat-publisher
 ```
 
 或手动安装到 Agent 客户端(推荐软链接,更新仓库即自动生效):
 
 ```bash
-git clone https://github.com/jiji262/wechat-publisher.git
+git clone https://github.com/foxzool/wechat-publisher.git
 cd wechat-publisher
 pip install requests pyyaml
 
@@ -52,11 +54,20 @@ accounts:
     author: "作者名"
 
 image_generation:
-  generator: "baoyu-image-gen"      # 或 baoyu-danger-gemini-web(Web 登录版 Gemini)
+  # baoyu-image-gen | baoyu-danger-gemini-web | grok-build
+  generator: "baoyu-image-gen"
+  # generator: "grok-build"   # 需 grok 在 PATH 且 ~/.grok/auth.json 已 OAuth
   gemini_proxy:
     base_url: "https://generativelanguage.googleapis.com"
     api_key: "AIza..."
     image_model: "gemini-2.5-flash"
+
+# 可选 zproxy(固定出口 IP,避免云机 40164):
+# zproxy:
+#   enabled: true
+#   server: "https://your-zproxy.example.com"
+#   api_key: "..."
+#   wechat_app_id_header: "MAIN"
 
 integrations:
   wechatsync_mcp_token: ""
@@ -67,6 +78,23 @@ integrations:
 ```bash
 python3 scripts/wechat_api.py list-accounts
 ```
+
+
+### grok-build 生图(可选)
+
+在云机上用 Grok Build 的 Imagine(`image_gen`)出图,无需 OpenAI/Gemini key:
+
+```yaml
+image_generation:
+  generator: "grok-build"
+```
+
+```bash
+python3 scripts/generate_image.py --generator grok-build \
+  -p "tiny red circle" --image /tmp/out.jpg --ar 1:1
+```
+
+要求: `grok` 在 PATH 上,且已完成 OAuth(`~/.grok/auth.json`)。
 
 ## 使用
 
