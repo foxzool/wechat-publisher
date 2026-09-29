@@ -483,7 +483,7 @@ def publish_from_brief(
     if not images_dir.exists():
         raise FileNotFoundError(
             f"找不到图片目录: {images_dir}\n"
-            f"请先用 newspic_build.py + scripts/baoyu_image_gen.ts 生成贴图,保存为 {images_dir}/01.png 起。"
+            f"请先用 newspic_build.py 拆卡 + scripts/generate_image.py 生成贴图,保存为 {images_dir}/01.png 起。"
         )
     exts = (".png", ".jpg", ".jpeg", ".webp")
     image_paths = sorted(

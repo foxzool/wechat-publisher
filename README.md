@@ -96,6 +96,20 @@ python3 scripts/generate_image.py --generator grok-build \
 
 要求: `grok` 在 PATH 上,且已完成 OAuth(`~/.grok/auth.json`)。
 
+### baoyu 配图方法 + grok-build(无文字配图)
+
+移植自 [baoyu-article-illustrator](https://github.com/JimLiu/baoyu-skills)(宝玉,MIT;经 Hermes Agent 移植)的 **Type × Style × Palette** 配图方法:分析文章 → 选图位 → 每张图一个 prompt 文件 → `generate_image.py --promptfiles` 出图(默认后端取 yaml,如 grok-build,无需 OpenAI/Gemini key)。**本 fork 强制图中无任何文字**:每个 prompt 结尾都带 no-text 条款,移植的风格/配色里所有要求加标签、手写字、排版的指令都已删除。
+
+```bash
+PY=.venv/bin/python
+$PY scripts/build_image_prompts.py outline 文章.md --out-dir ./illustrations --preset kids-picture-book
+# 编辑 illustrations/outline.yaml:把每个 DRAFT visual 改成具体的英文画面描述
+$PY scripts/build_image_prompts.py run --outline ./illustrations/outline.yaml --generator grok-build --jobs 3
+$PY scripts/build_image_prompts.py list   # types / styles / palettes / presets
+```
+
+详见 [`references/illustrator/README.md`](references/illustrator/README.md)(署名与许可见同目录 `PORT_NOTES.md` / `LICENSE.md`)。
+
 ## 使用
 
 ### 作为 Skill
@@ -182,11 +196,11 @@ python3 scripts/ai_score.py article.md --threshold 45
 ## 测试
 
 ```bash
-pip install pytest
-python3 -m pytest tests/ -v
+.venv/bin/python -m pip install pytest   # 或系统 python3
+.venv/bin/python -m pytest tests/ -q
 ```
 
-测试不依赖真实微信凭证(网络调用全部 mock),覆盖配置解析、AI 味打分与 HTML 转换安全性。
+测试不依赖真实微信凭证(网络调用全部 mock),覆盖配置解析、AI 味打分、HTML 转换安全性、grok-build 输出定位回归、配图 prompt 无文字检查与 builder 工作流。
 
 ## License
 

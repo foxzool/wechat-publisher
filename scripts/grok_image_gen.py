@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -131,25 +132,38 @@ def _jpeg_compress(src: Path, dest: Path, quality: int = 85) -> bool:
     return False
 
 
-def _ensure_output(requested: Path, workdir: Path) -> Path:
-    if requested.exists() and requested.stat().st_size > 0:
+def _ensure_output(requested: Path, search_dir: Path, since: float) -> Path:
+    """Return the image produced by THIS grok run.
+
+    Only ``search_dir`` (the private temp work dir grok ran in) is searched, and
+    only files modified at/after ``since`` count. The final output directory is
+    never searched, so sibling images there (e.g. earlier article images) can
+    never be picked up by mistake. Raises SystemExit if nothing qualifies.
+    """
+    slack = 2.0  # coarse filesystem mtime granularity
+    if (
+        requested.exists()
+        and requested.stat().st_size > 0
+        and requested.stat().st_mtime >= since - slack
+    ):
         return requested
     candidates: list[Path] = []
     for pat in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-        candidates.extend(workdir.glob(pat))
-        candidates.extend(workdir.rglob(pat))
+        candidates.extend(search_dir.rglob(pat))
     candidates = [
         p
-        for p in candidates
-        if p.is_file() and p.stat().st_size > 0 and p.resolve() != requested.resolve()
+        for p in set(candidates)
+        if p.is_file() and p.stat().st_size > 0 and p.stat().st_mtime >= since - slack
     ]
     if not candidates:
         raise SystemExit(
-            f"grok-build: no image at {requested} and none under {workdir}"
+            f"grok-build: no image produced in this run (expected {requested}; "
+            f"searched only {search_dir} for files newer than run start)"
         )
     newest = max(candidates, key=lambda p: p.stat().st_mtime)
-    requested.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(newest, requested)
+    if newest.resolve() != requested.resolve():
+        requested.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(newest, requested)
     return requested
 
 
@@ -189,68 +203,54 @@ def main(argv: list[str]) -> int:
     args = parse_args(argv)
     out = Path(args.image).expanduser().resolve()
     ar = _normalize_ar(args.ar)
-    workdir = out.parent
-    workdir.mkdir(parents=True, exist_ok=True)
+    out.parent.mkdir(parents=True, exist_ok=True)
 
     want_jpeg = (not args.no_jpeg) and out.suffix.lower() in {".jpg", ".jpeg"}
-    tmp_dir: Optional[str] = None
-    stage = out
-    if want_jpeg:
-        tmp_dir = tempfile.mkdtemp(prefix="grok-img-")
-        stage = Path(tmp_dir) / "generated.png"
-
+    # grok always runs in a private temp dir; the output dir is never its cwd,
+    # so the fallback search cannot see sibling images there.
+    work_dir = Path(tempfile.mkdtemp(prefix="grok-img-"))
+    stage_suffix = ".png" if want_jpeg else (out.suffix or ".png")
+    stage = work_dir / f"generated{stage_suffix}"
     agent_prompt = _agent_prompt(args.prompt, stage, ar, args.size, args.quality)
-    grok_cwd = stage.parent
-
-    if args.print_command:
-        print("generator: grok-build")
-        print(f"grok --always-approve --cwd {grok_cwd} -p {agent_prompt!r}")
-        if tmp_dir:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
-        return 0
 
     try:
-        code, combined = _run_grok(agent_prompt, workdir=grok_cwd, timeout=args.timeout)
-    except subprocess.TimeoutExpired as exc:
-        if tmp_dir:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
-        raise SystemExit(f"grok-build: grok timed out after {args.timeout}s") from exc
+        if args.print_command:
+            print("generator: grok-build")
+            print(f"grok --always-approve --cwd {work_dir} -p {agent_prompt!r}")
+            return 0
 
-    # Surface grok output (trimmed) for debugging
-    print(combined[-4000:] if len(combined) > 4000 else combined)
+        run_start = time.time()
+        try:
+            code, combined = _run_grok(agent_prompt, workdir=work_dir, timeout=args.timeout)
+        except subprocess.TimeoutExpired as exc:
+            raise SystemExit(f"grok-build: grok timed out after {args.timeout}s") from exc
 
-    if "GEN_FAIL" in combined:
-        if tmp_dir:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
-        for line in combined.splitlines():
-            if "GEN_FAIL" in line:
-                raise SystemExit(line.strip())
-        raise SystemExit("grok-build: GEN_FAIL (see grok output above)")
+        # Surface grok output (trimmed) for debugging
+        print(combined[-4000:] if len(combined) > 4000 else combined)
 
-    try:
-        produced = _ensure_output(stage, workdir)
-    except SystemExit:
-        if tmp_dir:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
-        if code != 0:
-            raise SystemExit(f"grok-build: grok exit={code}; no image produced") from None
-        raise
+        if "GEN_FAIL" in combined:
+            for line in combined.splitlines():
+                if "GEN_FAIL" in line:
+                    raise SystemExit(line.strip())
+            raise SystemExit("grok-build: GEN_FAIL (see grok output above)")
 
-    final = out
-    if want_jpeg:
-        ok = _jpeg_compress(produced, final, quality=args.jpeg_quality)
-        if not ok:
-            final.parent.mkdir(parents=True, exist_ok=True)
-            if produced.resolve() != final.resolve():
+        try:
+            produced = _ensure_output(stage, work_dir, since=run_start)
+        except SystemExit:
+            if code != 0:
+                raise SystemExit(f"grok-build: grok exit={code}; no image produced") from None
+            raise
+
+        final = out
+        if want_jpeg:
+            ok = _jpeg_compress(produced, final, quality=args.jpeg_quality)
+            if not ok:
                 shutil.copy2(produced, final)
-            print(f"[grok-build] left uncompressed at {final}", file=sys.stderr)
-    else:
-        final.parent.mkdir(parents=True, exist_ok=True)
-        if produced.resolve() != final.resolve():
+                print(f"[grok-build] left uncompressed at {final}", file=sys.stderr)
+        else:
             shutil.copy2(produced, final)
-
-    if tmp_dir:
-        shutil.rmtree(tmp_dir, ignore_errors=True)
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
 
     size = final.stat().st_size
     print(f"GEN_OK path={final} size={size}")
