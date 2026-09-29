@@ -112,7 +112,9 @@ python3 scripts/generate_image.py --account main --prompt "A hand-drawn AI infog
 可选值:
 - `baoyu-image-gen`:默认,支持 OpenAI Images 与 Gemini CLI / chat 代理,不依赖外部 baoyu skill
 - `baoyu-danger-gemini-web`:Web 登录版 Gemini,使用本 skill 内置拷贝 `scripts/baoyu_danger_gemini_web/`,需要本机 Google/Gemini Web 登录 cookie
-- `grok-build`:云机 Grok Build CLI + Imagine(`image_gen`);需 `grok` 在 PATH 且 `~/.grok/auth.json` 已 OAuth。实现见 `scripts/grok_image_gen.py`
+- `grok-build`:云机 Grok Build CLI + Imagine(`image_gen`);需 `grok` 在 PATH 且 `~/.grok/auth.json` 已 OAuth。实现见 `scripts/grok_image_gen.py`(grok 在私有临时目录运行,只认本次运行新生成的图,绝不会拿输出目录里的兄弟图片充数)
+
+**baoyu 配图方法(无文字)**:`scripts/build_image_prompts.py` 移植了 baoyu-article-illustrator 的 Type × Style × Palette 方法(23 种风格、4 种配色、预设,见 `references/illustrator/`)。流程:`outline`(分析文章、按现有 `![alt](…)` 或每个 H2 定图位,写 `outline.yaml`)→ 由你把每条 DRAFT `visual` 改成具体英文画面描述 → `run`(写 `prompts/NN-{type}-{slug}.md` 记录 + `.prompt.txt`,再逐张调用 `generate_image.py --promptfiles`)。每个 prompt 结尾强制 no-text 条款;`--wechat-style <name>` 可混入 `assets/image-styles` 模板(构建时去掉文字指令,JSON 本身不改,贴图模式不受影响;`marker-*` 纯文字卡风格拒绝)。儿童号推荐 `--preset kids-picture-book`。出图后仍需逐张目检是否有乱码字。
 
 **第一步:确认账号配置**
 
@@ -345,6 +347,8 @@ print(s['prompt_template']['article_inline'])
 ```
 
 替换 `{image_subject}` 占位符为你这张图的具体主题,喂给项目内置 `scripts/generate_image.py`。
+
+需要**图中完全无文字**(如儿童号)时,改用 baoyu 配图方法:`scripts/build_image_prompts.py outline|run`,说明见 `references/illustrator/README.md`。
 
 **禁忌**(和默认风格有冲突时以所选风格为准):
 - 不要混用风格 —— 一篇文章所有配图统一一种风格
